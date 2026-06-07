@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+venv/
+env/
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+
+# Experiment outputs
+checkpoints/
+checkpoints_*/
+generated_samples/
+generated_*/
+logs/
+wandb/
+*.log
+*.pth
+*.pt
+
+# Data
+data/*.csv
+# keep the tiny format example tracked
+!data/example_catalog.csv
+*.nii
+*.nii.gz

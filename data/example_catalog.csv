@@ -1,0 +1,4 @@
+SubjectID,FilePath,Age,Condition
+OPENBHB_train_IID_sub-836293495017_Group_CN_Sex_M_AGE_13,/path/to/dataset/OPENBHB_train_IID_sub-836293495017_Group_CN_Sex_M_AGE_13.nii.gz,13.0,CN
+ADNI1_IID_I46417_SID_023_S_1190_Group_CN_Sex_F_AGE_77,/path/to/dataset/ADNI1_IID_I46417_SID_023_S_1190_Group_CN_Sex_F_AGE_77.nii.gz,77.0,CN
+OASIS3_CN_OAS31085_MR_d0112_AGE_83.05_run-01_merged,/path/to/dataset/OASIS3_CN_OAS31085_MR_d0112_AGE_83.05_run-01_merged.nii.gz,83.05,CN

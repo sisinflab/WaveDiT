@@ -1,0 +1,31 @@
+# Core
+torch==2.6.0
+torchvision==0.21.0
+numpy
+einops>=0.7
+PyYAML>=6.0
+
+# Data / IO
+nibabel==5.3.2
+monai==1.4.0
+pandas==2.2.3
+pywavelets==1.8.0
+tqdm==4.67.1
+
+# Evaluation / logging / plotting
+scikit-image==0.25.2
+matplotlib>=3.7
+wandb==0.19.9
+
+# Optimal-Transport Flow Matching (only needed for `flow: ot_fm`)
+flow-matching==1.0.10
+
+# Neighborhood attention. OPTIONAL but recommended: NATTEN provides fused CUDA
+# kernels (the ground-truth, fastest path). Without it, WaveDiT automatically uses
+# an equivalent built-in pure-PyTorch fallback (CPU/GPU), so this is not required.
+# Install a wheel matching your torch/CUDA build for best speed:
+#   pip install natten -f https://whl.natten.org
+# natten
+
+# Optional: faster attention kernels (auto-detected if installed).
+# xformers==0.0.29.post3
