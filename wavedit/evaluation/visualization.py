@@ -52,7 +52,8 @@ def _dwt_roundtrip(image: torch.Tensor) -> torch.Tensor:
 
 
 def _to_unit_interval(volume: torch.Tensor) -> np.ndarray:
-    return np.clip((volume.cpu().numpy() + 1.0) / 2.0, 0.0, 1.0)
+    # .float() so bf16/fp16 sampler output converts to NumPy (no bfloat16 dtype there).
+    return np.clip((volume.float().cpu().numpy() + 1.0) / 2.0, 0.0, 1.0)
 
 
 @torch.no_grad()
