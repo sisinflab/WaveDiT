@@ -13,7 +13,7 @@ sampling across frequency bands.
 </p>
 
 **Links:** [Project page](https://danesed.github.io/wavedit-page/) · Paper (MICCAI 2026,
-proceedings link forthcoming) · arXiv (preprint)
+proceedings link forthcoming) · [arXiv](https://arxiv.org/abs/2606.08670)
 
 ## Key features
 
@@ -142,13 +142,14 @@ Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
 ## Citation
 
 ```bibtex
-
-% Temporary arXiv preprint.
-@article{danese2026wavedit,
-  title     = {WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis},
-  author    = {Danese, Danilo and Lombardi, Angela and Fasano, Giuseppe and Attimonelli, Matteo and Di Noia, Tommaso},
-  journal   = {arXiv preprint arXiv:XXXX.XXXXX},
-  year      = {2026}
+@misc{danese2026waveditdistributionawarewaveletflow,
+      title={WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis},
+      author={Danilo Danese and Angela Lombardi and Giuseppe Fasano and Matteo Attimonelli and Tommaso Di Noia},
+      year={2026},
+      eprint={2606.08670},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2606.08670},
 }
 ```
 
