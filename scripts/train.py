@@ -23,7 +23,7 @@ from torch.utils.data import DataLoader
 
 from wavedit import Config
 from wavedit.data import build_datasets, collate_fn
-from wavedit.evaluation import visualize_condition_sweep, visualize_generation
+from wavedit.evaluation import prepare_real_reference, visualize_condition_sweep, visualize_generation
 from wavedit.generation import generate_samples, parse_condition_sets
 from wavedit.models import build_model
 from wavedit.training import Trainer
@@ -83,16 +83,16 @@ def build_loaders(bundle, cfg: Config):
 
 
 def make_visualizer(model, val_loader, cfg: Config):
-    sweep_key = "age" if "age" in model.condition_config else next(iter(model.condition_config), None)
+    """Per-epoch W&B callback: one real reference at start, then one synthetic volume per epoch."""
     autocast_dtype = _AUTOCAST_DTYPES.get(cfg.precision, torch.bfloat16)
+    cache: dict = {}
 
     def visualize(epoch: int) -> None:
-        visualize_generation(model, val_loader, cfg.data.image_size,
-                              sampler=cfg.sampling.sampler, cfg_rescale=cfg.sampling.cfg_rescale,
-                              epoch=epoch, use_wandb=True, autocast_dtype=autocast_dtype)
-        if sweep_key is not None:
-            visualize_condition_sweep(model, cfg.data.image_size, sweep_key, epoch=epoch,
-                                      use_wandb=True, autocast_dtype=autocast_dtype)
+        if cache.get("real_recon") is None:
+            cache["real_recon"] = prepare_real_reference(model, val_loader, use_wandb=True)
+        visualize_generation(model, cache["real_recon"],
+                             sampler=cfg.sampling.sampler, cfg_rescale=cfg.sampling.cfg_rescale,
+                             epoch=epoch, use_wandb=True, autocast_dtype=autocast_dtype)
 
     return visualize
 
@@ -134,6 +134,10 @@ def main():
         try:
             wandb.init(project=cfg.logging.wandb_project, entity=cfg.logging.wandb_entity,
                        name=cfg.run_name, config=cfg.to_dict())
+            # NOTE: do not use wandb.define_metric() here — as of 2026-06 it silently
+            # breaks server-side history ingestion (rows never appear, only summary).
+            # Stepless wandb.log with 'epoch'/'global_step' as plain fields works; set
+            # the chart X axis to 'epoch' in the workspace settings instead.
         except Exception as exc:  # noqa: BLE001 - never let logging setup abort a run
             logger.warning("Could not initialise W&B (%s); continuing without it.", exc)
             cfg.logging.wandb = False
@@ -159,6 +163,13 @@ def main():
     trainer = Trainer(model, train_loader, val_loader, cfg, run_dir, checkpoint_metadata, visualizer)
     trainer.fit()
     torch.cuda.empty_cache() if device.type == "cuda" else None
+
+    # One condition sweep on the final (best) weights instead of one per epoch.
+    if cfg.logging.wandb and model.condition_config:
+        sweep_key = "age" if "age" in model.condition_config else next(iter(model.condition_config))
+        visualize_condition_sweep(model, cfg.data.image_size, sweep_key, num_values=5,
+                                  use_wandb=True,
+                                  autocast_dtype=_AUTOCAST_DTYPES.get(cfg.precision, torch.bfloat16))
 
     if cfg.post_train_generation.enabled:
         logger.info("Running post-training sample generation.")

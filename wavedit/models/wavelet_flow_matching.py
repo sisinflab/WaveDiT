@@ -188,8 +188,10 @@ class WaveletFlowMatching(nn.Module):
         loss, diagnostics = self._weighted_velocity_loss(v_pred, v_target, log_vars_map, global_step, use_wandb_logging)
 
         if use_wandb_logging and global_step % LOG_INTERVAL == 0:
-            log_dict = {"loss/total_loss": loss.item(), **diagnostics}
-            wandb.log(log_dict, step=global_step)
+            # No explicit step= : W&B silently drops rows whose step is behind the
+            # internal counter once stepless logs (e.g. images) have advanced it.
+            log_dict = {"loss/total_loss": loss.item(), "global_step": global_step, **diagnostics}
+            wandb.log(log_dict)
         return loss
 
     # ------------------------------------------------------------------ #

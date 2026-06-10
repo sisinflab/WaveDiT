@@ -57,45 +57,65 @@ def _to_unit_interval(volume: torch.Tensor) -> np.ndarray:
 
 
 @torch.no_grad()
-def visualize_generation(model, val_loader, model_output_size, *,
+def prepare_real_reference(model, val_loader, *, use_wandb=True):
+    """Cache one real validation volume (wavelet round-trip) and log it once as the reference."""
+    try:
+        batch = next(iter(val_loader))
+        if batch is None:
+            logger.warning("prepare_real_reference: empty batch; skipping.")
+            return None
+        images, _ = batch
+        device = next(model.parameters()).device
+        real_recon = _dwt_roundtrip(images[:1].to(device))
+        if use_wandb:
+            wandb.log({"generation/real": wandb.Image(
+                create_ortho_view(_to_unit_interval(real_recon[0, 0])),
+                caption="Real (wavelet round-trip)")})
+        return real_recon
+    except StopIteration:
+        logger.warning("prepare_real_reference: validation loader exhausted.")
+        return None
+    except Exception as exc:  # noqa: BLE001
+        logger.error("prepare_real_reference failed: %s", exc, exc_info=True)
+        return None
+
+
+@torch.no_grad()
+def visualize_generation(model, real_recon=None, *,
                          sampler="heun", cfg_scale=1.0, cfg_rescale=0.7, epoch=None, use_wandb=True,
                          autocast_dtype=None):
-    """Log an orthogonal view of a real validation volume next to a generated one."""
+    """Log one synthetic volume under a constant key, with PSNR/SSIM vs the cached reference.
+
+    Constant keys give a single W&B media panel with a step slider (instead of one
+    panel per epoch); ``real_recon`` comes from :func:`prepare_real_reference`.
+    """
     device = next(model.parameters()).device
     amp_dtype = autocast_dtype if autocast_dtype is not None else torch.bfloat16
     amp_enabled = device.type == "cuda" and amp_dtype != torch.float32
     model.eval()
     try:
-        batch = next(iter(val_loader))
-        if batch is None:
-            logger.warning("visualize_generation: empty batch; skipping.")
-            return
-        images, _ = batch
-        real = images[:1].to(device)
-
         with torch.amp.autocast(device_type=device.type, dtype=amp_dtype, enabled=amp_enabled):
-            real_recon = _dwt_roundtrip(real)
             synthetic = model.sample(
                 num_samples=1, raw_conditions=dict(model.null_conditions),
                 cfg_scale=cfg_scale, sampler=sampler, cfg_rescale=cfg_rescale,
                 autocast_dtype=amp_dtype,
             )
 
-        psnr_val, ssim_val = evaluate_recon_quality(real_recon, synthetic)
-        suffix = f"_Ep{epoch}" if epoch is not None else "_Final"
-
+        tag = f"epoch {epoch}" if epoch is not None else "final"
+        caption = f"WaveDiT ({tag}, CFG {cfg_scale:.1f})"
+        payload = {}
+        if real_recon is not None:
+            psnr_val, ssim_val = evaluate_recon_quality(real_recon, synthetic)
+            caption += f" | PSNR {psnr_val:.2f}, SSIM {ssim_val:.4f}"
+            payload["generation/psnr"] = psnr_val
+            payload["generation/ssim"] = ssim_val
+            logger.info("Generation viz (%s): PSNR=%.2f SSIM=%.4f", tag, psnr_val, ssim_val)
+        payload["generation/synthetic"] = wandb.Image(
+            create_ortho_view(_to_unit_interval(synthetic[0, 0])), caption=caption)
+        if epoch is not None:
+            payload["epoch"] = epoch
         if use_wandb:
-            wandb.log({
-                f"generation/real{suffix}": wandb.Image(
-                    create_ortho_view(_to_unit_interval(real_recon[0, 0])), caption="Real (wavelet round-trip)"),
-                f"generation/synthetic{suffix}": wandb.Image(
-                    create_ortho_view(_to_unit_interval(synthetic[0, 0])),
-                    caption=f"WaveDiT (PSNR {psnr_val:.2f}, SSIM {ssim_val:.4f}, CFG {cfg_scale:.1f})"),
-            })
-        else:
-            logger.info("Generation viz (epoch %s): PSNR=%.2f SSIM=%.4f", epoch, psnr_val, ssim_val)
-    except StopIteration:
-        logger.warning("visualize_generation: validation loader exhausted.")
+            wandb.log(payload)
     except Exception as exc:  # noqa: BLE001
         logger.error("visualize_generation failed: %s", exc, exc_info=True)
 
