@@ -48,12 +48,24 @@ variants use the same CFM objective, Morpheus scheduler and HDiT backbone; each
 changes a single axis.
 
 
-| Checkpoint | Variant | Changes vs. baseline | Params | Status |
-|---|---|---|---|---|
-| `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ⏳ training |
-| `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ⏳ training |
-| `WaveDiT-Deep.pth` | deeper | depth 4/4 | 190M | ⏳ training |
-| `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | ⏳ training |
+| Checkpoint | Variant | Changes vs. baseline | Params | Full-res inference VRAM¹ | Status |
+|---|---|---|---|---|---|
+| `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ~3.1 GB (runs from 4 GB) | 🟡 pre-release · ⏳ training |
+| `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ~8.4 GB (runs from 10 GB) | 🟡 pre-release · ⏳ training |
+| `WaveDiT-Deep.pth` | deeper | depth 4/4 | 190M | — | ⏳ training |
+| `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | — | ⏳ training |
+
+> **Pre-release.** `WaveDiT-Base` and `WaveDiT-FinePatch` currently ship a **pre-release**
+> checkpoint so the models can already be used (e.g. for the demo); the final trained
+> weights are still in progress and will replace them. `WaveDiT-Deep` and `WaveDiT-Wide`
+> are training and not yet uploaded.
+
+¹ Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun
+(`torch.cuda.max_memory_reserved`). The HDiT backbone is **highly scalable**: because
+patch size, width and depth are config knobs over a compact wavelet latent, WaveDiT fits
+a wide range of hardware budgets: **full-resolution inference runs on GPUs from 4 GB
+upward** (Base), and the same configs scale training down to modest GPUs by adjusting
+batch size / variant. No high-end accelerator is required to *use* the models.
 
 ## How to use
 
@@ -68,23 +80,36 @@ pip install -r requirements.txt
 ```python
 from huggingface_hub import hf_hub_download
 
-# pick a variant: WaveDiT-Base | WaveDiT-FinePatch | WaveDiT-Deep | WaveDiT-Wide
-ckpt = hf_hub_download("danesed/WaveDiT", "WaveDiT-Base.pth", revision="v1.0")
+# pick a variant: WaveDiT-Base | WaveDiT-FinePatch  (Deep/Wide coming soon)
+# revision="main" during the pre-release phase; a frozen "v1.0" tag will follow.
+ckpt = hf_hub_download("danesed/WaveDiT", "WaveDiT-Base.pth", revision="main")
 ```
 
 ```bash
-# 4 volumes at age 45, cropped to the standard 182x218x182 MNI grid
+# 4 volumes at age 45, cropped to the standard 182x218x182 MNI grid.
+# NOTE: global flags (--num-flow-steps, --sampler, --save-size, ...) go BEFORE the subcommand.
 PYTHONPATH=. python scripts/generate.py "$CKPT" out/ \
-    specific --conditions "age=45.0" --num-samples 4 \
-    --num-flow-steps 10 --sampler heun --save-size 182 218 182
+    --num-flow-steps 10 --sampler heun --save-size 182 218 182 \
+    specific --conditions "age=45.0" --num-samples 4
 
 # Linear age sweep, one volume per step
 PYTHONPATH=. python scripts/generate.py "$CKPT" out/ \
     linear --condition age --min 6 --max 95 --num 100
 ```
 
+No NATTEN? Set `WAVEDIT_NA_BACKEND=torch` to use the built-in pure-PyTorch neighbourhood
+attention (e.g. on Spaces); the same checkpoint produces equivalent volumes.
+
 Volumes are written as NIfTI (`.nii.gz`) with intensities in `[0, 1]`.
 The checkpoint loads with the `torch.load` default `weights_only=True` (PyTorch ≥ 2.6).
+
+## Samples (pre-release preview)
+
+Age-conditioned synthesis with `WaveDiT-FinePatch` at a fixed seed (100 Heun steps);
+rows are axial · coronal · sagittal mid-slices, columns span ages 6→95. Generated with the
+**pre-release** checkpoint — to be refreshed with the final weights.
+
+![WaveDiT-FinePatch aging](assets/samples/WaveDiT-FinePatch_aging.png)
 
 ## Training data
 

@@ -120,9 +120,10 @@ generation needs only the checkpoint and your sampling choices.
 
 ```bash
 # Specific condition sets (N samples each)
+# NOTE: global flags (--cfg-scale, --num-flow-steps, --sampler, --save-size, ...) go BEFORE the subcommand.
 PYTHONPATH=. python scripts/generate.py checkpoints/WaveDiT_CFM/best.pth out/ \
-    specific --conditions "age=45.0" "age=70.5" --num-samples 10 \
-    --cfg-scale 1.5 --num-flow-steps 10 --sampler heun --save-size 182 218 182
+    --cfg-scale 1.5 --num-flow-steps 10 --sampler heun --save-size 182 218 182 \
+    specific --conditions "age=45.0" "age=70.5" --num-samples 10
 
 # Linearly interpolate one condition (one sample per step)
 PYTHONPATH=. python scripts/generate.py checkpoints/WaveDiT_CFM/best.pth out/ \
