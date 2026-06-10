@@ -32,8 +32,8 @@ Official model release for the MICCAI 2026 paper:
 
 ## Model description
 
-- **Latent space:** one-level 3D Haar wavelet transform of a 224³ T1-weighted volume →
-  an 8-channel 112³ latent (1 low-frequency LLL band + 7 high-frequency bands).
+- **Wavelets:** one-level 3D Haar wavelet transform of a 224³ T1-weighted volume →
+  an 8-channel 112³ representation (1 low-frequency LLL band + 7 high-frequency bands).
 - **Objective:** conditional flow matching (linear interpolant, velocity prediction),
   weighted by a Bayesian heteroscedastic loss whose per-band log-variances are predicted
   by Morpheus from the statistical signature of the current noisy state.
@@ -55,17 +55,17 @@ changes a single axis.
 | `WaveDiT-Deep.pth` | deeper | depth 4/4 | 190M | — | ⏳ training |
 | `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | — | ⏳ training |
 
-> **Pre-release.** `WaveDiT-Base` and `WaveDiT-FinePatch` currently ship a **pre-release**
-> checkpoint so the models can already be used (e.g. for the demo); the final trained
-> weights are still in progress and will replace them. `WaveDiT-Deep` and `WaveDiT-Wide`
-> are training and not yet uploaded.
+> **Pre-release.** `WaveDiT-Base` and `WaveDiT-FinePatch` currently are available as **pre-release**
+> checkpoint; the final trained
+> weights will replace them.
 
 ¹ Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun
 (`torch.cuda.max_memory_reserved`). The HDiT backbone is **highly scalable**: because
-patch size, width and depth are config knobs over a compact wavelet latent, WaveDiT fits
+patch size, width and depth are config knobs over a compact wavelet representation, WaveDiT fits
 a wide range of hardware budgets: **full-resolution inference runs on GPUs from 4 GB
 upward** (Base), and the same configs scale training down to modest GPUs by adjusting
 batch size / variant. No high-end accelerator is required to *use* the models.
+
 
 ## How to use
 
@@ -105,9 +105,9 @@ The checkpoint loads with the `torch.load` default `weights_only=True` (PyTorch 
 
 ## Samples (pre-release preview)
 
-Age-conditioned synthesis with `WaveDiT-FinePatch` at a fixed seed (100 Heun steps);
+Age-conditioned synthesis with `WaveDiT-FinePatch` at a fixed seed;
 rows are axial · coronal · sagittal mid-slices, columns span ages 6→95. Generated with the
-**pre-release** checkpoint — to be refreshed with the final weights.
+**pre-release** checkpoint.
 
 ![WaveDiT-FinePatch aging](assets/samples/WaveDiT-FinePatch_aging.png)
 
