@@ -1,11 +1,12 @@
 # WaveDiT ZeroGPU Space - lean generation-only dependencies.
 #
 # IMPORTANT (ZeroGPU contract):
-#  * Torch is PROVIDED by the ZeroGPU base image (>= 2.8.0). Do NOT pin it here.
-#    Pinning torch==2.6.0 (the repo default) triggers "No candidate PyTorch version
-#    found for ZeroGPU" and fails the hardware match.
-#  * Do NOT install the `wavedit` package (its pyproject pins torch==2.6.0). The
-#    wavedit/ source tree is VENDORED into this Space instead.
+#  * torch MUST be listed and pinned to a ZeroGPU-SUPPORTED version. Per the ZeroGPU
+#    docs, supported PyTorch is 2.8.0..latest (2.8.0 / 2.9.1 / 2.10.0 / 2.11.0); the
+#    repo default 2.6.0 is NOT supported (pinning it fails the hardware match with
+#    "No candidate PyTorch version found for ZeroGPU"). The checkpoints are plain
+#    state_dicts and load fine on 2.8. Do NOT install the `wavedit` package itself
+#    (its pyproject pins torch==2.6.0) - the wavedit/ source is VENDORED here instead.
 #  * Do NOT pin `spaces` - the platform pins its own; a conflicting pin breaks
 #    pip resolution at build time. List it unpinned.
 #  * wandb / matplotlib / monai / pandas / scikit-image / torchvision / flow-matching
@@ -14,6 +15,7 @@
 #    trainer.py, and the only other wandb importer -- evaluation/visualization.py --
 #    is pruned from the vendored tree entirely).
 
+torch==2.8.0
 gradio==6.17.3
 spaces
 numpy

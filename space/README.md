@@ -9,7 +9,7 @@ python_version: "3.12.12"
 app_file: app.py
 pinned: false
 license: cc-by-nc-4.0
-short_description: Generate & explore synthetic 3D brain MRIs in your browser (research only)
+short_description: Generate & explore synthetic 3D brain MRIs in-browser
 models:
   - danesed/WaveDiT
 disable_embedding: false
