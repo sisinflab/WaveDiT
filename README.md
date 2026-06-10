@@ -170,4 +170,8 @@ Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
 
 WaveDiT builds on the wavelet-domain analysis and multi-level evaluation protocol of our previous work, [FlowLet](https://danesed.github.io/flowlet-page/).
 
-The HDiT backbone is adapted from [k-diffusion](https://github.com/crowsonkb/k-diffusion). See `LICENSE`.
+The HDiT backbone is adapted from [k-diffusion](https://github.com/crowsonkb/k-diffusion).
+
+The invertible 3D wavelet transform builds on the great work of [WDM](https://github.com/pfriedri/wdm-3d)
+
+ See `LICENSE`.
