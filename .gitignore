@@ -35,3 +35,4 @@ data/*.csv
 !data/example_catalog.csv
 *.nii
 *.nii.gz
+

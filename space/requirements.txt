@@ -1,0 +1,25 @@
+# WaveDiT ZeroGPU Space - lean generation-only dependencies.
+#
+# IMPORTANT (ZeroGPU contract):
+#  * Torch is PROVIDED by the ZeroGPU base image (>= 2.8.0). Do NOT pin it here.
+#    Pinning torch==2.6.0 (the repo default) triggers "No candidate PyTorch version
+#    found for ZeroGPU" and fails the hardware match.
+#  * Do NOT install the `wavedit` package (its pyproject pins torch==2.6.0). The
+#    wavedit/ source tree is VENDORED into this Space instead.
+#  * Do NOT pin `spaces` - the platform pins its own; a conflicting pin breaks
+#    pip resolution at build time. List it unpinned.
+#  * wandb / matplotlib / monai / pandas / scikit-image / torchvision / flow-matching
+#    are NOT needed on the sampling path and are intentionally omitted (wandb is made
+#    optional via the vendored lazy-import patch in wavelet_flow_matching.py and
+#    trainer.py, and the only other wandb importer -- evaluation/visualization.py --
+#    is pruned from the vendored tree entirely).
+
+gradio==6.17.3
+spaces
+numpy
+einops==0.8.0
+nibabel==5.3.2
+pyyaml>=6.0
+pywavelets==1.8.0
+tqdm==4.67.1
+huggingface_hub
