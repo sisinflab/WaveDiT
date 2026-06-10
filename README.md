@@ -1,5 +1,14 @@
 # WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis
 
+<p align="center">
+  <a href="https://huggingface.co/spaces/danesed/WaveDiT-demo"><img alt="Try the demo on Hugging Face Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Demo-Try%20on%20Spaces-ff9d00?style=for-the-badge"></a>
+  <a href="https://huggingface.co/danesed/WaveDiT"><img alt="Models on Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Models-WaveDiT-FFD21E?style=for-the-badge"></a>
+  <a href="https://huggingface.co/papers/2606.08670"><img alt="Paper on Hugging Face" src="https://img.shields.io/badge/Paper-HF-2F6DB0?style=for-the-badge"></a>
+  <a href="https://arxiv.org/abs/2606.08670"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.08670-B31B1B?style=for-the-badge"></a>
+</p>
+
+> 🤗 **Try WaveDiT in your browser:** pick an age, generate a synthetic 3D brain MRI, and explore it interactively (triplane + 3D viewer with clip-plane slicing). No install needed &rarr; **[huggingface.co/spaces/danesed/WaveDiT-demo](https://huggingface.co/spaces/danesed/WaveDiT-demo)**
+
 Official PyTorch implementation of *"WaveDiT: Distribution-Aware Wavelet Flow Matching
 for Efficient 3D Brain MRI Synthesis"* (MICCAI 2026).
 
@@ -12,8 +21,11 @@ sampling across frequency bands.
   <img src="assets/WaveDiT_Architecture.png" width="700" alt="WaveDiT architecture">
 </p>
 
-**Links:** [Project page](https://danesed.github.io/wavedit-page/) · Paper (MICCAI 2026,
-proceedings link forthcoming) · [arXiv](https://arxiv.org/abs/2606.08670)
+**Links:** [🤗 Live demo](https://huggingface.co/spaces/danesed/WaveDiT-demo) ·
+[🤗 Models](https://huggingface.co/danesed/WaveDiT) ·
+[Project page](https://danesed.github.io/wavedit-page/) ·
+[HF paper](https://huggingface.co/papers/2606.08670) ·
+[arXiv](https://arxiv.org/abs/2606.08670)
 
 ## Key features
 
