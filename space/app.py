@@ -819,6 +819,7 @@ CSS = """
 .dark #badge textarea { background:#0d1117 !important; color:#9fe0ff !important; }
 .prov textarea { font-family: var(--font-mono) !important; font-size:12px !important; }
 .links a { margin-right:14px; text-decoration:none; font-weight:600; color:#4f46e5; }
+.links img { display:inline-block !important; vertical-align:middle; margin:0; }
 .links a:hover { color:#7c3aed; }
 .dark .links a { color:#a5b4fc; }
 .dark .links a:hover { color:#c4b5fd; }
@@ -833,7 +834,7 @@ footer { display:none !important; }
 # Build UI
 # --------------------------------------------------------------------------- #
 def build_demo() -> gr.Blocks:
-    with gr.Blocks(title="WaveDiT - 3D Brain MRI Generator", theme=THEME, css=CSS) as demo:
+    with gr.Blocks(title="WaveDiT - 3D Brain MRI Generator") as demo:
 
         # ---- Header ----
         with gr.Row(elem_id="hdr"):
@@ -856,7 +857,8 @@ def build_demo() -> gr.Blocks:
             f'<a href="{LINK_CODE}" target="_blank" title="Star WaveDiT on GitHub" '
             f'style="vertical-align:middle">'
             f'<img src="https://img.shields.io/github/stars/sisinflab/WaveDiT?style=social" '
-            f'alt="Star WaveDiT on GitHub" style="vertical-align:middle"></a>'
+            f'alt="Star WaveDiT on GitHub" '
+            f'style="display:inline-block;vertical-align:middle;margin:0"></a>'
             '</div>'
         )
 
@@ -1052,6 +1054,8 @@ if __name__ == "__main__":
     # WAVEDIT_SHARE=1 opens a public *.gradio.live tunnel (handy when the server is
     # remote and localhost isn't reachable, e.g. VS Code over VPN). Off by default.
     demo.queue(max_size=24).launch(
+        theme=THEME,
+        css=CSS,
         allowed_paths=[str(DOWNLOAD_DIR)],
         share=os.environ.get("WAVEDIT_SHARE") == "1",
     )
