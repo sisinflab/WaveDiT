@@ -793,8 +793,12 @@ THEME = gr.themes.Soft(
     font_mono=[gr.themes.GoogleFont("JetBrains Mono"), "ui-monospace", "monospace"],
     radius_size=gr.themes.sizes.radius_sm,
 ).set(
-    body_background_fill="linear-gradient(180deg,#0d1117 0%,#10131c 100%)",
-    block_background_fill="#161b26",
+    # Base values = LIGHT theme; the *_dark variants keep the original dark palette.
+    # Gradio follows the user's system/HF theme automatically (no theme is forced).
+    body_background_fill="linear-gradient(180deg,#f6f8fc 0%,#eef1f8 100%)",
+    body_background_fill_dark="linear-gradient(180deg,#0d1117 0%,#10131c 100%)",
+    block_background_fill="#ffffff",
+    block_background_fill_dark="#161b26",
     block_radius="3px",
     button_primary_background_fill="linear-gradient(90deg,#6366f1,#a855f7)",
     button_primary_text_color="#ffffff",
@@ -804,13 +808,20 @@ CSS = """
 #hdr h1 { margin: 0; font-size: 1.6rem; }
 .pill { display:inline-block; padding:3px 10px; border-radius:4px; font-size:0.75rem;
         font-weight:600; margin-right:6px; }
-.pill-amber { background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); }
-.pill-warn  { background:rgba(239,68,68,0.12);  color:#fca5a5; border:1px solid rgba(239,68,68,0.35); }
+/* Pills, badge and links carry their own colors, so they need explicit
+   light + dark variants (Gradio toggles dark mode via a `.dark` root class). */
+.pill-amber { background:rgba(245,158,11,0.15); color:#b45309; border:1px solid rgba(245,158,11,0.4); }
+.pill-warn  { background:rgba(239,68,68,0.12);  color:#b91c1c; border:1px solid rgba(239,68,68,0.35); }
+.dark .pill-amber { color:#fbbf24; }
+.dark .pill-warn  { color:#fca5a5; }
 #badge textarea { font-family: var(--font-mono) !important; font-size:12px !important;
-                  background:#0d1117 !important; color:#9fe0ff !important; }
+                  background:#eef2ff !important; color:#1e3a8a !important; }
+.dark #badge textarea { background:#0d1117 !important; color:#9fe0ff !important; }
 .prov textarea { font-family: var(--font-mono) !important; font-size:12px !important; }
-.links a { margin-right:14px; text-decoration:none; font-weight:600; color:#a5b4fc; }
-.links a:hover { color:#c4b5fd; }
+.links a { margin-right:14px; text-decoration:none; font-weight:600; color:#4f46e5; }
+.links a:hover { color:#7c3aed; }
+.dark .links a { color:#a5b4fc; }
+.dark .links a:hover { color:#c4b5fd; }
 footer { display:none !important; }
 @media (max-width: 860px) {
   #workbench { flex-direction: column-reverse !important; }
