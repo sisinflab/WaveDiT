@@ -15,6 +15,8 @@ tags:
 
 # WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis
 
+[![Star on GitHub](https://img.shields.io/github/stars/sisinflab/WaveDiT?style=social)](https://github.com/sisinflab/WaveDiT)
+
 WaveDiT synthesises full-resolution, age-conditioned 3D brain MRIs by performing
 **conditional flow matching in the 3D Haar wavelet domain** with a slice-wise **HDiT**
 transformer backbone, guided by **Morpheus**, a state-aware uncertainty scheduler that
@@ -23,10 +25,6 @@ adaptively weights the loss and sampling across frequency bands.
 > 🤗 **Try it live, no install:** pick an age and generate a synthetic 3D brain MRI you can
 > rotate and slice in your browser &rarr; **[Demo Space](https://huggingface.co/spaces/danesed/WaveDiT-demo)**
 
-<p align="center">
-  <a href="https://github.com/sisinflab/WaveDiT"><img src="https://img.shields.io/github/stars/sisinflab/WaveDiT?style=social" alt="Star WaveDiT on GitHub"></a>
-  <br><sub>If WaveDiT is useful to you, consider starring the repo on GitHub.</sub>
-</p>
 
 Official model release for the MICCAI 2026 paper:
 
@@ -38,7 +36,8 @@ Official model release for the MICCAI 2026 paper:
 [Code (GitHub)](https://github.com/sisinflab/WaveDiT) ·
 [Project page](https://danesed.github.io/wavedit-page/) ·
 [HF paper](https://huggingface.co/papers/2606.08670) ·
-[arXiv](https://arxiv.org/abs/2606.08670)
+[arXiv](https://arxiv.org/abs/2606.08670) ·
+
 
 <p align="center">
   <img src="assets/WaveDiT_Architecture.png" width="760" alt="WaveDiT architecture">
