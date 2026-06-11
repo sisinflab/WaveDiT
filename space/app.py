@@ -848,7 +848,7 @@ def build_demo() -> gr.Blocks:
             '<span class="pill pill-amber">Pre-release checkpoints</span>'
             '<span class="pill pill-warn">&#9888;&#65039; Research demo, synthetic, not for clinical use</span>'
             '</div>'
-            f'<div class="links" style="margin-top:8px">'
+            f'<div class="links" style="margin-top:8px;white-space:nowrap">'
             f'<a href="{LINK_PAPER}" target="_blank">\U0001f4c4 Paper</a>'
             f'<a href="{LINK_CODE}" target="_blank">\U0001f4bb Code</a>'
             f'<a href="{LINK_PROJECT}" target="_blank">\U0001f310 Project page</a>'
