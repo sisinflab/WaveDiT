@@ -23,6 +23,11 @@ adaptively weights the loss and sampling across frequency bands.
 > 🤗 **Try it live, no install:** pick an age and generate a synthetic 3D brain MRI you can
 > rotate and slice in your browser &rarr; **[Demo Space](https://huggingface.co/spaces/danesed/WaveDiT-demo)**
 
+<p align="center">
+  <a href="https://github.com/sisinflab/WaveDiT"><img src="https://img.shields.io/github/stars/sisinflab/WaveDiT?style=social" alt="Star WaveDiT on GitHub"></a>
+  <br><sub>If WaveDiT is useful to you, consider starring the repo on GitHub.</sub>
+</p>
+
 Official model release for the MICCAI 2026 paper:
 
 > **WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis**

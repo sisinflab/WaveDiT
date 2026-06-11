@@ -854,6 +854,11 @@ def build_demo() -> gr.Blocks:
             f'<a href="{LINK_PROJECT}" target="_blank">\U0001f310 Project page</a>'
             f'<a href="{LINK_MODEL}" target="_blank">\U0001f917 Model</a>'
             '</div>'
+            f'<div style="margin-top:8px">'
+            f'<a href="{LINK_CODE}" target="_blank" title="Star WaveDiT on GitHub">'
+            f'<img src="https://img.shields.io/github/stars/sisinflab/WaveDiT?style=social" '
+            f'alt="Star WaveDiT on GitHub"></a>'
+            '</div>'
         )
 
         sweep_state = gr.State({})
