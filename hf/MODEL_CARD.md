@@ -59,14 +59,12 @@ changes a single axis.
 
 | Checkpoint | Variant | Changes vs. baseline | Params | Full-res inference VRAM¹ | Status |
 |---|---|---|---|---|---|
-| `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ~3.1 GB (runs from 4 GB) | 🟡 pre-release · ⏳ training |
+| `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ~3.1 GB (runs from 4 GB) | ✅ trained |
 | `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ~8.4 GB (runs from 10 GB) | 🟡 pre-release · ⏳ training |
 | `WaveDiT-Deep.pth` | deeper | depth 4/4 | 190M | — | ⏳ training |
 | `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | — | ⏳ training |
 
-> **Pre-release.** `WaveDiT-Base` and `WaveDiT-FinePatch` currently are available as **pre-release**
-> checkpoint; the final trained
-> weights will replace them.
+
 
 ¹ Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun
 (`torch.cuda.max_memory_reserved`). The HDiT backbone is **highly scalable**: because
