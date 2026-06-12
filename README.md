@@ -1,11 +1,11 @@
 # WaveDiT Studio
 
 A native macOS app for generating and exploring age-conditioned synthetic 3D brain MRI,
-entirely on your Mac.
+entirely on your Mac (Windows and Linux).
 
 <p align="center">
   <img alt="macOS" src="https://img.shields.io/badge/macOS-Apple%20Silicon-000000?style=for-the-badge&logo=apple&logoColor=white">
-  <img alt="Native" src="https://img.shields.io/badge/Native-PyTorch%20MPS%20%C2%B7%20no%20Electron-6366F1?style=for-the-badge">
+  <img alt="Native" src="https://img.shields.io/badge/Native-PyTorch%20MPS-6366F1?style=for-the-badge">
   <a href="https://huggingface.co/danesed/WaveDiT"><img alt="Models on Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Models-WaveDiT-FFD21E?style=for-the-badge"></a>
   <a href="https://arxiv.org/abs/2606.08670"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.08670-B31B1B?style=for-the-badge"></a>
   <a href="https://danesed.github.io/wavedit-page/"><img alt="Project page" src="https://img.shields.io/badge/Project-page-2F6DB0?style=for-the-badge"></a>
@@ -16,11 +16,9 @@ entirely on your Mac.
 </p>
 
 WaveDiT Studio puts [WaveDiT](https://arxiv.org/abs/2606.08670), a wavelet-domain flow
-matching model (MICCAI 2026), in a polished desktop app. Pick an age, generate a full
+matching model (MICCAI 2026), in a desktop app. Pick an age, generate a full
 resolution volume on your Mac's GPU (Apple Silicon, PyTorch MPS), and explore it in an
-interactive multiplanar and 3D viewer modelled on MRIcroGL. It is native, not an Electron
-wrapper: a Python backend on Apple MPS drives a system WebKit window. Everything runs
-locally and, after the one-time weights download, fully offline.
+interactive multiplanar and 3D viewer modelled on MRIcroGL. It is native: a Python backend on Apple MPS drives a system WebKit window. Everything runs locally and, after the one-time weights download, fully offline.
 
 > **Research use only.** WaveDiT Studio produces synthetic images for research and
 > education. It is not a medical device, provides no diagnostic information, and must not
@@ -28,19 +26,17 @@ locally and, after the one-time weights download, fully offline.
 
 ## Highlights
 
-- **Open on a real brain.** The app launches showing a bundled sample volume, so there is
-  never an empty stage, even before any weights are downloaded.
+
 - **Three viewer layouts.** Cycle between a multiplanar strip, a 2x2 grid, and a large 3D
   render. One toggle hides the X, Y and Z crosshair lines and the clip plane for a clean
   3D view.
-- **Live accelerator meter.** A fancy GPU/CPU memory meter next to the device chip animates
+- **Live accelerator meter.** A GPU/CPU memory meter animates
   while the model is working, alongside the peak-memory badge.
 - **Full control.** Age, seed, flow steps, sampler (Euler by default, or Heun), guidance
   scale and Morpheus uncertainty guidance, with a live time estimate.
 - **Aging time-lapse.** Sweep an age range with a fixed seed and scrub through the
   synthetic aging trajectory frame by frame.
-- **Model manager.** Download official variants, see announced variants (Deep, Wide) as
-  "coming soon" placeholders that become downloadable on their own once released, and
+- **Model manager.** Download official variants and
   **import your own WaveDiT checkpoint** to try a new config or training set.
 - **Library and export.** Every generation is kept with its exact settings; reuse, re-open
   or export any volume as NIfTI (`.nii.gz`).
@@ -89,7 +85,7 @@ and are downloaded only once.
 
 ## Models
 
-- **Official variants** download from Hugging Face and stay on your Mac.
+- **Official variants** download from Hugging Face and stay on your Mac, offline.
 - **Coming soon** variants (Deep, Wide) appear as transparent placeholders while they are
   still training. Once they are published to `danesed/WaveDiT` the app detects them and
   turns them into normal downloads on its own, with no update required.
