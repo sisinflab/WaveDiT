@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://huggingface.co/spaces/danesed/WaveDiT-demo"><img alt="Try the demo on Hugging Face Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Demo-Try%20on%20Spaces-ff9d00?style=for-the-badge"></a>
+  <a href="https://github.com/sisinflab/WaveDiT/tree/macos-app"><img alt="WaveDiT Studio for macOS" src="https://img.shields.io/badge/WaveDiT%20Studio-macOS%20app-000000?style=for-the-badge&logo=apple&logoColor=white"></a>
   <a href="https://huggingface.co/danesed/WaveDiT"><img alt="Models on Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Models-WaveDiT-FFD21E?style=for-the-badge"></a>
   <a href="https://huggingface.co/papers/2606.08670"><img alt="Paper on Hugging Face" src="https://img.shields.io/badge/Paper-HF-2F6DB0?style=for-the-badge"></a>
   <a href="https://arxiv.org/abs/2606.08670"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.08670-B31B1B?style=for-the-badge"></a>
