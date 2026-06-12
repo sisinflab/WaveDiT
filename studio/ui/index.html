@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WaveDiT Studio</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- Shared SVG defs: accent gradients used by every inline mark below -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <linearGradient id="grad-accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="grad-accent-rev" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a855f7"/><stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="app" id="app">
+
+  <!-- ============================== SIDEBAR ============================== -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="panel brand-row">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path class="w1" d="M1 16 Q5 6 9 16 T17 16 T25 16 T33 16"/>
+        <path class="w2" d="M1 16 Q5 24 9 16 T17 16 T25 16 T33 16"/>
+        <path class="w3" d="M1 16 Q3 11 5 16 T9 16 T13 16 T17 16 T21 16 T25 16 T29 16 T33 16"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-title">
+          <h1 class="brand-name">WaveDiT Studio</h1>
+          <span class="version-badge" id="version-badge">v…</span>
+        </div>
+        <p class="brand-copyright">© Danilo Danese</p>
+      </div>
+    </div>
+
+    <section class="panel" aria-labelledby="age-title">
+      <header class="panel-title" id="age-title">Age</header>
+      <div class="age-hero">
+        <div class="age-readout-wrap">
+          <span class="age-readout" id="age-readout">72</span>
+          <span class="age-unit">years</span>
+        </div>
+        <button class="icon-btn" id="age-dice" title="Random age" aria-label="Random age">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="5.4" cy="5.4" r="1.25" fill="currentColor"/><circle cx="10.6" cy="5.4" r="1.25" fill="currentColor"/><circle cx="5.4" cy="10.6" r="1.25" fill="currentColor"/><circle cx="10.6" cy="10.6" r="1.25" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <input type="range" id="age-slider" min="6" max="95" step="1" value="72" aria-label="Age in years">
+      <p class="microcopy" id="age-microcopy">Senior years: ventricles widen, sulci deepen.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="model-title">
+      <header class="panel-title" id="model-title">Model</header>
+      <div class="segmented model-seg" id="model-seg" role="radiogroup" aria-label="Checkpoint">
+        <!-- populated by app.js from /api/state weights -->
+      </div>
+    </section>
+
+    <section class="panel gen-panel">
+      <button class="btn-primary generate-btn" id="generate-btn">
+        <span class="gen-fill" id="generate-fill" aria-hidden="true"></span>
+        <span class="gen-label" id="generate-label">Generate</span>
+        <span class="kbd-hint" id="generate-hint">Cmd+Return</span>
+      </button>
+      <button class="btn-ghost cancel-btn" id="cancel-btn" hidden>Cancel</button>
+    </section>
+
+    <details class="panel disclosure" id="panel-advanced">
+      <summary><span>Advanced</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+      <div class="disclosure-body">
+
+        <div class="field">
+          <label class="field-label" for="seed-input">Seed</label>
+          <div class="field-row">
+            <input type="number" id="seed-input" min="0" max="2147483647" step="1" value="42" inputmode="numeric">
+            <button class="icon-btn" id="seed-dice" title="Random seed" aria-label="Random seed">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="5.4" cy="5.4" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="10.6" cy="10.6" r="1.25" fill="currentColor"/></svg>
+            </button>
+            <button class="chip-btn" id="seed-last" title="Restore the seed of the last generation">last</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label class="field-label" for="steps-slider">Steps</label>
+            <span class="field-value mono" id="steps-value">10</span>
+          </div>
+          <input type="range" id="steps-slider" min="1" max="200" step="1" value="10">
+          <p class="microcopy" id="steps-estimate">time estimate appears after the first run</p>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label class="field-label" for="cfg-slider">CFG scale</label>
+            <span class="field-value mono" id="cfg-value">1.0</span>
+          </div>
+          <input type="range" id="cfg-slider" min="1" max="8" step="0.1" value="1">
+        </div>
+
+        <div class="field">
+          <span class="field-label">Sampler</span>
+          <div class="segmented" id="sampler-seg" role="radiogroup" aria-label="Sampler">
+            <button class="seg-cell" data-sampler="heun" role="radio" aria-checked="false">Heun</button>
+            <button class="seg-cell selected" data-sampler="euler" role="radio" aria-checked="true">Euler</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label class="field-label" for="morpheus-slider">Morpheus</label>
+            <span class="field-value mono" id="morpheus-value">1.00</span>
+          </div>
+          <input type="range" id="morpheus-slider" min="0" max="2" step="0.05" value="1">
+          <p class="microcopy" id="morpheus-hint" hidden>0 disables Morpheus guidance (ablation mode)</p>
+        </div>
+
+      </div>
+    </details>
+
+    <section class="panel" aria-labelledby="presets-title">
+      <header class="panel-title" id="presets-title">Presets</header>
+      <div class="chip-row" id="presets-row">
+        <button class="chip-btn" data-preset="child" title="A young brain, age 8">Child 8</button>
+        <button class="chip-btn" data-preset="adult" title="A brain in its prime, age 35">Adult 35</button>
+        <button class="chip-btn" data-preset="elder" title="A senior brain, age 82">Elder 82</button>
+        <button class="chip-btn" data-preset="showcase" title="FinePatch, 100 steps, seed 42, age 72: the slow, beautiful one">Showcase</button>
+        <button class="chip-btn" data-preset="surprise" title="Random age, random seed, random colors">Surprise me</button>
+      </div>
+    </section>
+
+    <details class="panel disclosure" id="panel-sweep">
+      <summary><span>Time-lapse</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+      <div class="disclosure-body">
+        <p class="microcopy">Same brain, aging before your eyes.</p>
+        <div class="field-row sweep-ages">
+          <div class="field">
+            <label class="field-label" for="sweep-start">Start age</label>
+            <input type="number" id="sweep-start" min="6" max="95" step="1" value="10" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label class="field-label" for="sweep-end">End age</label>
+            <input type="number" id="sweep-end" min="6" max="95" step="1" value="90" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-head">
+            <label class="field-label" for="sweep-frames">Frames</label>
+            <span class="field-value mono" id="sweep-frames-value">5</span>
+          </div>
+          <input type="range" id="sweep-frames" min="3" max="10" step="1" value="5">
+        </div>
+        <label class="check-row" for="sweep-fixed-seed">
+          <input type="checkbox" id="sweep-fixed-seed" checked>
+          <span>Fixed seed (same anatomy across frames)</span>
+        </label>
+        <button class="btn-secondary" id="sweep-run">Run sweep</button>
+      </div>
+    </details>
+
+    <footer class="sidebar-footer">
+      Research demo. Synthetic images. Not a medical device.
+      <a href="#" id="about-link">About</a>
+    </footer>
+  </aside>
+
+  <!-- =============================== MAIN ================================ -->
+  <main class="main">
+
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-left">
+        <span class="chip device-chip" id="device-chip" title="Compute device">
+          <span class="dot ready" id="device-dot"></span>
+          <span id="device-name">detecting…</span>
+        </span>
+        <span class="chip load-meter" id="load-meter" title="Accelerator memory in use">
+          <span class="load-label" id="load-label">GPU</span>
+          <span class="load-track"><span class="load-fill" id="load-fill"></span></span>
+          <span class="load-val mono" id="load-val">idle</span>
+        </span>
+        <span class="chip mono" id="memory-badge" hidden title="Peak accelerator memory of the last run"></span>
+      </div>
+      <div class="toolbar-right">
+        <select id="colormap-select" class="select" title="Colormap" aria-label="Colormap">
+          <option value="gray" selected>gray</option>
+          <option value="bone">bone</option>
+          <option value="viridis">viridis</option>
+          <option value="plasma">plasma</option>
+          <option value="inferno">inferno</option>
+          <option value="magma">magma</option>
+          <option value="hot">hot</option>
+          <option value="cubehelix">cubehelix</option>
+        </select>
+        <label class="gamma-wrap" title="Gamma">
+          <span class="gamma-label">γ</span>
+          <input type="range" id="gamma-slider" min="0.3" max="2.2" step="0.05" value="1" aria-label="Gamma">
+        </label>
+        <button class="icon-btn" id="layout-btn" title="Viewer layout: rows" aria-label="Cycle viewer layout">
+          <svg class="ic-layout-row" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="3" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="6.5" y="4" width="3" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="11.5" y="4" width="3" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg class="ic-layout-grid" viewBox="0 0 16 16" aria-hidden="true" hidden><rect x="2" y="2" width="5" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="2" width="5" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="9" width="5" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg class="ic-layout-3d" viewBox="0 0 16 16" aria-hidden="true" hidden><path d="M8 1.6 14 5v6L8 14.4 2 11V5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 5l6 3.4L14 5M8 8.4v6" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="guides-btn" title="Hide crosshair and clip plane" aria-label="Toggle viewer guides" aria-pressed="true">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v13M1.5 8h13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="4.5" y="4.5" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.65"/></svg>
+        </button>
+        <button class="icon-btn" id="reset-view-btn" title="Reset view" aria-label="Reset view">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 1.8v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="fullscreen-btn" title="Expand viewer" aria-label="Expand viewer" aria-pressed="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="weights-btn" title="Models" aria-label="Models">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v8M5 6.5l3 3 3-3M2.5 11v2.2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="badge-dot" id="weights-badge-dot" hidden></span>
+        </button>
+        <button class="btn-toolbar" id="export-btn" title="Export the current volume as .nii.gz (Cmd+E)">Export .nii.gz</button>
+        <button class="icon-btn" id="copy-prov-btn" title="Copy provenance" aria-label="Copy provenance">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="stage-inner" id="stage-inner">
+        <canvas id="gl"></canvas>
+
+        <!-- empty state hero -->
+        <div class="empty-state" id="empty-state">
+          <svg class="hero-waves" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <g class="wave-layer wave-a"><path d="M-600 160 q75 -110 150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0"/></g>
+            <g class="wave-layer wave-b"><path d="M-600 190 q75 -70 150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0"/></g>
+            <g class="wave-layer wave-c"><path d="M-600 130 q75 -130 150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0"/></g>
+          </svg>
+          <div class="empty-copy">
+            <h2 class="empty-headline">Synthesize a brain</h2>
+            <p class="empty-subline">WaveDiT turns noise into a full-resolution 3D brain MRI, conditioned on the age you choose, entirely on this Mac.</p>
+            <button class="btn-primary empty-cta" id="empty-generate-btn">Generate a brain</button>
+          </div>
+        </div>
+
+        <!-- WebGL2 fallback -->
+        <div class="webgl-fallback" id="webgl-fallback" hidden>
+          <div class="fallback-card">
+            <h3>3D viewer unavailable</h3>
+            <p>This window could not get a WebGL2 context, so the in-app viewer is disabled.
+               Generations still work: export the volume and open it in any NIfTI viewer.</p>
+            <p class="mono fallback-msg" id="fallback-msg"></p>
+            <button class="btn-secondary" id="fallback-export-btn">Export .nii.gz</button>
+          </div>
+        </div>
+
+        <!-- generation overlay -->
+        <div class="gen-overlay" id="gen-overlay" hidden>
+          <div class="ring-wrap">
+            <div class="ring" id="gen-ring"></div>
+            <div class="ring-center">
+              <span class="ring-pct" id="gen-pct">0%</span>
+              <span class="ring-eta" id="gen-eta"></span>
+            </div>
+          </div>
+          <div class="gen-step mono" id="gen-step"></div>
+          <div class="gen-model" id="gen-model"></div>
+        </div>
+
+        <!-- crossfade cover -->
+        <div class="stage-cover" id="stage-cover" aria-hidden="true"></div>
+      </div>
+
+      <!-- sweep scrubber -->
+      <div class="sweep-bar" id="sweep-bar" hidden>
+        <button class="icon-btn" id="sweep-play" title="Play time-lapse" aria-label="Play time-lapse">
+          <svg class="ic-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4L13 8z" fill="currentColor"/></svg>
+          <svg class="ic-pause" viewBox="0 0 16 16" aria-hidden="true" hidden><path d="M4 2.8h2.6v10.4H4zM9.4 2.8H12v10.4H9.4z" fill="currentColor"/></svg>
+        </button>
+        <div class="sweep-track">
+          <input type="range" id="sweep-scrub" min="0" max="4" step="1" value="0" aria-label="Time-lapse frame">
+          <div class="sweep-ticks" id="sweep-ticks"></div>
+        </div>
+        <button class="icon-btn" id="sweep-loop" title="Loop" aria-label="Loop" aria-pressed="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 0 1 8.6-3.4M13 8a5 5 0 0 1-8.6 3.4M11 1.6l1.4 3-3.1.4M5 14.4l-1.4-3 3.1-.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="sweep-close" title="Close time-lapse" aria-label="Close time-lapse">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <button class="caption-bar mono" id="provenance-bar" title="Click to copy provenance">no volume loaded yet</button>
+    </div>
+
+    <!-- ============================ LIBRARY SHELF =========================== -->
+    <div class="shelf" id="shelf">
+      <button class="shelf-toggle" id="shelf-toggle" title="Toggle library (Cmd+L)" aria-label="Toggle library">
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 7.5 6 4.5 9 7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="shelf-scroll" id="shelf-scroll">
+        <div class="shelf-cards" id="shelf-cards"></div>
+        <div class="shelf-empty" id="shelf-empty" hidden>
+          <div class="skel-card"></div><div class="skel-card"></div><div class="skel-card"></div>
+          <span class="shelf-hint">Generated brains will appear here</span>
+        </div>
+      </div>
+      <div class="shelf-meta" id="shelf-meta"></div>
+    </div>
+  </main>
+</div>
+
+<!-- =============================== MODALS ================================ -->
+<div class="modal-root" id="modal-root" hidden>
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div>
+</div>
+
+<template id="tpl-onboarding">
+  <div class="ob-step ob-step-1">
+    <svg class="hero-waves ob-waves" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="wave-layer wave-a"><path d="M-600 160 q75 -110 150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0"/></g>
+      <g class="wave-layer wave-b"><path d="M-600 190 q75 -70 150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0"/></g>
+      <g class="wave-layer wave-c"><path d="M-600 130 q75 -130 150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0 t150 0"/></g>
+    </svg>
+    <h2>Welcome to WaveDiT Studio</h2>
+    <ul class="ob-bullets">
+      <li><strong>Full-resolution 3D volumes.</strong> 182 x 218 x 182 voxels of synthetic brain MRI, explorable in 3D.</li>
+      <li><strong>Age conditioning.</strong> Dial a brain anywhere from childhood to late life and watch anatomy follow.</li>
+      <li><strong>Runs entirely on this Mac.</strong> After a one-time weights download, nothing leaves your machine.</li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn-primary" data-action="ob-next">Continue</button>
+    </div>
+  </div>
+  <div class="ob-step ob-step-2" hidden>
+    <h2>Get the model weights</h2>
+    <p class="modal-sub">Checkpoints download once from Hugging Face (<span class="mono">danesed/WaveDiT</span>) and stay on this Mac.</p>
+    <div class="weights-list" data-role="weights-list"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" data-action="ob-finish" disabled>Start creating</button>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-weights">
+  <h2>Models</h2>
+  <p class="modal-sub">Official checkpoints download once from Hugging Face (<span class="mono">danesed/WaveDiT</span>) and stay on this Mac. You can also import your own WaveDiT checkpoint.</p>
+  <div class="weights-list" data-role="weights-list"></div>
+</template>
+
+<template id="tpl-about">
+  <div class="about-head">
+    <svg class="brand-mark about-mark" viewBox="0 0 32 32" aria-hidden="true">
+      <path class="w1" d="M1 16 Q5 6 9 16 T17 16 T25 16 T33 16"/>
+      <path class="w2" d="M1 16 Q5 24 9 16 T17 16 T25 16 T33 16"/>
+      <path class="w3" d="M1 16 Q3 11 5 16 T9 16 T13 16 T17 16 T21 16 T25 16 T29 16 T33 16"/>
+    </svg>
+    <div>
+      <h2>WaveDiT Studio</h2>
+      <p class="modal-sub" data-role="about-version">version</p>
+    </div>
+  </div>
+  <div class="about-banner">
+    <p class="about-tagline">Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis</p>
+    <p class="about-venue">MICCAI 2026</p>
+  </div>
+
+  <div class="about-section">
+    <h3 class="about-h3">Paper authors</h3>
+    <p class="about-authors"><strong>Danilo Danese</strong>, Angela Lombardi, Giuseppe Fasano, Matteo Attimonelli, Tommaso Di Noia.<br>SisInfLab, Politecnico di Bari</p>
+  </div>
+
+  <div class="about-section">
+    <h3 class="about-h3">Application</h3>
+    <p class="about-app">WaveDiT Studio designed and built by <strong>Danilo Danese</strong>
+      (<a href="https://github.com/danesed" target="_blank" rel="noopener">@danesed</a> on GitHub).</p>
+    <p class="about-copy">© Danilo Danese. App code under MIT; model weights CC BY-NC 4.0.</p>
+  </div>
+
+  <div class="about-links">
+    <!-- Real anchors: pywebview's Cocoa delegate routes target=_blank navigations
+         to the default browser (window.open from JS does nothing in WKWebView). -->
+    <a class="chip-btn" href="https://arxiv.org/abs/2606.08670" target="_blank" rel="noopener">Paper</a>
+    <a class="chip-btn" href="https://github.com/sisinflab/WaveDiT" target="_blank" rel="noopener">Code</a>
+    <a class="chip-btn" href="https://danesed.github.io/wavedit-page" target="_blank" rel="noopener">Project page</a>
+    <a class="chip-btn" href="https://huggingface.co/danesed/WaveDiT" target="_blank" rel="noopener">Model</a>
+    <a class="chip-btn" href="https://github.com/danesed" target="_blank" rel="noopener">GitHub @danesed</a>
+  </div>
+  <div class="bibtex-wrap">
+    <pre class="bibtex mono" data-role="bibtex">@misc{danese2026waveditdistributionawarewaveletflow,
+      title={WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis},
+      author={Danilo Danese and Angela Lombardi and Giuseppe Fasano and Matteo Attimonelli and Tommaso Di Noia},
+      year={2026},
+      eprint={2606.08670},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2606.08670},
+}</pre>
+    <button class="chip-btn bibtex-copy" data-action="copy-bibtex">Copy BibTeX</button>
+  </div>
+  <p class="microcopy about-disclaimer">Research artifact only. Synthetic images, not a medical device, not for clinical use.</p>
+</template>
+
+<template id="tpl-confirm">
+  <h2 data-role="confirm-title">Delete?</h2>
+  <p class="modal-sub" data-role="confirm-message"></p>
+  <div class="modal-actions">
+    <button class="btn-ghost" data-action="confirm-cancel">Cancel</button>
+    <button class="btn-danger" data-action="confirm-ok">Delete</button>
+  </div>
+</template>
+
+<div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+<script src="vendor/niivue.umd.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

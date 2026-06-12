@@ -1,158 +1,147 @@
-# WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis
+# WaveDiT Studio
+
+A native macOS app for generating and exploring age-conditioned synthetic 3D brain MRI,
+entirely on your Mac.
 
 <p align="center">
-  <a href="https://huggingface.co/spaces/danesed/WaveDiT-demo"><img alt="Try the demo on Hugging Face Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Demo-Try%20on%20Spaces-ff9d00?style=for-the-badge"></a>
+  <img alt="macOS" src="https://img.shields.io/badge/macOS-Apple%20Silicon-000000?style=for-the-badge&logo=apple&logoColor=white">
+  <img alt="Native" src="https://img.shields.io/badge/Native-PyTorch%20MPS%20%C2%B7%20no%20Electron-6366F1?style=for-the-badge">
   <a href="https://huggingface.co/danesed/WaveDiT"><img alt="Models on Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Models-WaveDiT-FFD21E?style=for-the-badge"></a>
-  <a href="https://huggingface.co/papers/2606.08670"><img alt="Paper on Hugging Face" src="https://img.shields.io/badge/Paper-HF-2F6DB0?style=for-the-badge"></a>
   <a href="https://arxiv.org/abs/2606.08670"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.08670-B31B1B?style=for-the-badge"></a>
+  <a href="https://danesed.github.io/wavedit-page/"><img alt="Project page" src="https://img.shields.io/badge/Project-page-2F6DB0?style=for-the-badge"></a>
 </p>
-
-> 🤗 **Try WaveDiT in your browser:** pick an age, generate a synthetic 3D brain MRI, and explore it interactively (triplane + 3D viewer with clip-plane slicing). No install needed &rarr; **[huggingface.co/spaces/danesed/WaveDiT-demo](https://huggingface.co/spaces/danesed/WaveDiT-demo)**
-
-Official PyTorch implementation of *"WaveDiT: Distribution-Aware Wavelet Flow Matching
-for Efficient 3D Brain MRI Synthesis"* (MICCAI 2026).
-
-WaveDiT synthesises full resolution, high-fidelity, conditional 3D brain MRIs by performing **flow
-matching in the 3D Haar wavelet domain** with a slice-wise **HDiT** backbone, guided by
-**Morpheus**, a state-aware uncertainty scheduler that adaptively weights the loss and
-sampling across frequency bands.
 
 <p align="center">
-  <img src="assets/WaveDiT_Architecture.png" width="700" alt="WaveDiT architecture">
+  <img src="docs/screenshot.png" width="860" alt="WaveDiT Studio interface">
 </p>
 
-**Links:** [🤗 Live demo](https://huggingface.co/spaces/danesed/WaveDiT-demo) ·
-[🤗 Models](https://huggingface.co/danesed/WaveDiT) ·
-[Project page](https://danesed.github.io/wavedit-page/) ·
-[HF paper](https://huggingface.co/papers/2606.08670) ·
-[arXiv](https://arxiv.org/abs/2606.08670)
+WaveDiT Studio puts [WaveDiT](https://arxiv.org/abs/2606.08670), a wavelet-domain flow
+matching model (MICCAI 2026), in a polished desktop app. Pick an age, generate a full
+resolution volume on your Mac's GPU (Apple Silicon, PyTorch MPS), and explore it in an
+interactive multiplanar and 3D viewer modelled on MRIcroGL. It is native, not an Electron
+wrapper: a Python backend on Apple MPS drives a system WebKit window. Everything runs
+locally and, after the one-time weights download, fully offline.
 
-## Key features
+> **Research use only.** WaveDiT Studio produces synthetic images for research and
+> education. It is not a medical device, provides no diagnostic information, and must not
+> be used for clinical decision making.
 
-- **Wavelet flow matching**: operates on the 8-channel 3D Haar latent (1 LLL + 7 HF bands).
-- **Morpheus uncertainty scheduler**: Bayesian heteroscedastic loss weighting + uncertainty-minimising sampling guidance.
-- **HDiT backbone**: neighbourhood + spatio-depth factorised attention for efficient 3D modelling.
-- **Multiple flow formulations**: `cfm`, `rectified`, `ot_fm`.
-- **Conditional synthesis**: numeric and categorical metadata (e.g. age), with classifier-free guidance.
-- **Single-file configs**: one YAML fully describes a run; checkpoints are self-contained for generation.
+## Highlights
 
-## Morpheus: state-aware uncertainty
+- **Open on a real brain.** The app launches showing a bundled sample volume, so there is
+  never an empty stage, even before any weights are downloaded.
+- **Three viewer layouts.** Cycle between a multiplanar strip, a 2x2 grid, and a large 3D
+  render. One toggle hides the X, Y and Z crosshair lines and the clip plane for a clean
+  3D view.
+- **Live accelerator meter.** A fancy GPU/CPU memory meter next to the device chip animates
+  while the model is working, alongside the peak-memory badge.
+- **Full control.** Age, seed, flow steps, sampler (Euler by default, or Heun), guidance
+  scale and Morpheus uncertainty guidance, with a live time estimate.
+- **Aging time-lapse.** Sweep an age range with a fixed seed and scrub through the
+  synthetic aging trajectory frame by frame.
+- **Model manager.** Download official variants, see announced variants (Deep, Wide) as
+  "coming soon" placeholders that become downloadable on their own once released, and
+  **import your own WaveDiT checkpoint** to try a new config or training set.
+- **Library and export.** Every generation is kept with its exact settings; reuse, re-open
+  or export any volume as NIfTI (`.nii.gz`).
 
-Wavelet subbands are not statistically equal: the low-frequency approximation stays close to
-Gaussian, while the high-frequency bands are sparse and heavy-tailed, and these statistics
-shift along the flow trajectory. **Morpheus** is a lightweight network that, at each step,
-reads the statistical signature of the current noisy state (per-band mean, standard
-deviation, max amplitude, L2 energy, skewness and kurtosis) and predicts a per-band
-log-variance. That prediction plays two roles:
+## Requirements
 
-- **Weighting the loss:** it forms a Bayesian heteroscedastic objective
-  (`0.5 * exp(-s) * ||v - v_target||^2 + 0.5 * s`) that down-weights inherently unpredictable
-  high-frequency content, while the `0.5 * s` term prevents trivial variance inflation. The
-  result is state-dependent precision instead of a uniform MSE.
-- **Conditioning the backbone:** the projected log-variances become a *frequency hint*,
-  injected alongside the time, slice and age embeddings, so the transformer adapts its
-  prediction to the current reliability of each band, during both training and sampling.
+- Apple Silicon Mac (M1 or newer). Intel Macs are not supported.
+- macOS 13 (Ventura) or newer.
+- About 2 GB of free disk space for the app, plus the model weights you download
+  (roughly 0.5 to 1.5 GB per model variant).
+- 16 GB of RAM recommended for comfortable generation.
 
+## Build
 
-## Installation
+Build on the Mac that will run the app (or any Apple Silicon Mac). Only stock macOS tools
+are used; Xcode and Homebrew are not required. A Python 3.11 to 3.13 interpreter or
+[uv](https://docs.astral.sh/uv/) must be available.
 
 ```bash
-conda create -n wavedit_env python=3.11 && conda activate wavedit_env
+git clone https://github.com/danesed/WaveDiT.git
+cd WaveDiT
+git checkout macos-app
+./build.sh
+```
+
+The script creates a local build venv, verifies the vendored 3D viewer, renders the app
+icon, freezes the app with PyInstaller, runs a self check, signs the bundle (ad-hoc) and
+produces `dist/WaveDiT-Studio-1.0.0.dmg`.
+
+## Install
+
+1. Open the DMG and drag **WaveDiT Studio** into **Applications**.
+2. First launch only: the app is ad-hoc signed (no Apple Developer certificate), so
+   Gatekeeper shows a warning. Right-click (or control-click) the app in Applications,
+   choose **Open**, then confirm. macOS remembers the choice.
+   - Alternative, from a terminal:
+     `xattr -dr com.apple.quarantine "/Applications/WaveDiT Studio.app"`
+
+## First run
+
+On first launch the app opens an onboarding panel and offers to download model weights from
+[huggingface.co/danesed/WaveDiT](https://huggingface.co/danesed/WaveDiT) with live progress.
+Start with **Base**; other variants can be added or removed at any time from the model
+manager. Weights are stored under `~/Library/Application Support/WaveDiT Studio/checkpoints`
+and are downloaded only once.
+
+## Models
+
+- **Official variants** download from Hugging Face and stay on your Mac.
+- **Coming soon** variants (Deep, Wide) appear as transparent placeholders while they are
+  still training. Once they are published to `danesed/WaveDiT` the app detects them and
+  turns them into normal downloads on its own, with no update required.
+- **Import a checkpoint** lets you load any local WaveDiT `.pth` (a new architecture config
+  or a model trained on a different dataset). The file is validated as a real WaveDiT
+  checkpoint, copied into the app, and listed under "Your models", ready to generate with.
+
+## Dev mode (run from source, any OS)
+
+The backend and UI run unbundled on macOS, Linux or Windows for development. From the
+repository root:
+
+```bash
 pip install -r requirements.txt
-# Optional but recommended: fused neighbourhood-attention CUDA kernels (match your build):
-pip install natten -f https://whl.natten.org
-# Optional, faster global attention:
-# pip install -U xformers
+PYTHONPATH=. python -m studio
 ```
 
-Developed for Python 3.11 and PyTorch 2.6 (CUDA recommended).
+Useful environment variables:
 
-> **NATTEN is optional.** It is the fastest, ground-truth implementation of the
-> neighbourhood attention used in the default config, but WaveDiT ships an
-> equivalent built-in pure-PyTorch fallback,
-> so the model runs without NATTEN, including on CPU. The backend is chosen
-> automatically; override with `WAVEDIT_NA_BACKEND=auto|natten|torch`.
+| Variable | Effect |
+| --- | --- |
+| `WAVEDIT_STUDIO_HEADLESS=1` | Server only, no window; open the printed URL in a browser. |
+| `WAVEDIT_STUDIO_DEVICE` | Force `mps`, `cuda` or `cpu` (default: best available). |
+| `WAVEDIT_STUDIO_CKPT_DIR` | Use an existing checkpoints directory instead of downloading. |
+| `WAVEDIT_STUDIO_DATA_DIR` | Override the data directory (settings, library, exports). |
+| `WAVEDIT_STUDIO_PORT` | Fixed server port (default: a random free port). |
 
-## Repository layout
+`python -m studio --selfcheck` prints versions and the selected device, then exits.
+The internal design is documented in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-```
-configs/            One YAML per experiment (cfm, rectified, ot_fm)
-train.sh            bash train.sh [config.yaml]      -> launches training
-generate.sh         bash generate.sh <ckpt> [outdir] -> generates samples
-scripts/
-  train.py          config-driven training entry point
-  generate.py       generation (specific condition sets or linear interpolation)
-  prepare_metadata.py  build the metadata CSV from NIfTI folders
-tools/
-  slim_checkpoint.py   strip optimiser state for release/inference
-wavedit/
-  config.py         typed config loaded from YAML
-  data/             unified dataset (CSV / filename), augmentation, collation
-  wavelets/         differentiable 3D Haar DWT/IDWT
-  models/           WaveletFlowMatching, DiT3D backbone, Morpheus, sampling, hdit/
-  training/         Trainer + checkpoint I/O
-  generation/       sample generation
-  evaluation/       metrics + W&B visualisation
-  utils/            logging + seeding
-```
+## Troubleshooting
 
-## Data
+- **"WaveDiT Studio cannot be opened"**: this is Gatekeeper reacting to the ad-hoc
+  signature. Right-click the app, choose **Open**, confirm once. See Install above.
+- **First generation is slow**: the model is loading onto the GPU. Subsequent generations
+  are much faster.
+- **Where is my data?** Everything lives in `~/Library/Application Support/WaveDiT Studio`
+  (settings, checkpoints, library, exports). Volumes are plain `.nii.gz` files you can open
+  with any NIfTI tool.
+- **Reset the app**: quit, then delete that folder. The next launch starts fresh.
 
-See [`data/README.md`](data/README.md). In short, build a catalog once:
+## Credits
 
-```bash
-python scripts/prepare_metadata.py --input-dirs /path/to/scans --output-csv ./data/dataset.csv
-```
+WaveDiT Studio is designed and built by **Danilo Danese**
+([@danesed](https://github.com/danesed)), on top of the official WaveDiT model from
+SisInfLab, Politecnico di Bari.
 
-then point `data.metadata_csv` in your config at it. Raw scans and catalogs are
-git-ignored and must be obtained from the original dataset providers.
-
-## Training
-
-Edit a config (data paths, architecture, hyper-parameters) and launch:
-
-```bash
-bash train.sh configs/cfm.yaml
-```
-
-Or run the entry point directly:
-
-```bash
-PYTHONPATH=. python scripts/train.py configs/cfm.yaml
-```
-
-Each run writes to `<checkpoint_dir>/<run_name>/`: `best.pth`, `last.pth`, a copy of the
-resolved `config.yaml`, and logs. Set `logging.wandb: true` for W&B metrics and
-visualisations. Switch the objective with `model.flow` (`cfm` | `rectified` | `ot_fm`).
-
-## Generation
-
-Checkpoints are self-contained (they embed the config and condition metadata), so
-generation needs only the checkpoint and your sampling choices.
-
-```bash
-# Specific condition sets (N samples each)
-# NOTE: global flags (--cfg-scale, --num-flow-steps, --sampler, --save-size, ...) go BEFORE the subcommand.
-PYTHONPATH=. python scripts/generate.py checkpoints/WaveDiT_CFM/best.pth out/ \
-    --cfg-scale 1.5 --num-flow-steps 10 --sampler heun --save-size 182 218 182 \
-    specific --conditions "age=45.0" "age=70.5" --num-samples 10
-
-# Linearly interpolate one condition (one sample per step)
-PYTHONPATH=. python scripts/generate.py checkpoints/WaveDiT_CFM/best.pth out/ \
-    linear --condition age --min 6 --max 95 --num 100
-```
-
-Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
-
-| Argument | Meaning |
-|---|---|
-| `--cfg-scale` | Classifier-free guidance scale (1.0 = none). |
-| `--num-flow-steps` | ODE integration steps (overrides the checkpoint default). |
-| `--sampler` | `heun` (2nd order) or `euler`. |
-| `--morpheus-scale` | Uncertainty-guidance scale (0 disables it). |
-| `--save-size` | Center-crop saved volumes to `D H W` (default: full model output). |
-
-## Citation
+- Paper: [arXiv:2606.08670](https://arxiv.org/abs/2606.08670) /
+  [Hugging Face paper page](https://huggingface.co/papers/2606.08670)
+- Code: [github.com/sisinflab/WaveDiT](https://github.com/sisinflab/WaveDiT)
+- Project page: [danesed.github.io/wavedit-page](https://danesed.github.io/wavedit-page/)
+- Models: [huggingface.co/danesed/WaveDiT](https://huggingface.co/danesed/WaveDiT)
 
 ```bibtex
 @misc{danese2026waveditdistributionawarewaveletflow,
@@ -166,8 +155,8 @@ Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
 }
 ```
 
-## Acknowledgements
+The in-app 3D viewer is [Niivue](https://github.com/niivue/niivue). The HDiT backbone is
+adapted from [k-diffusion](https://github.com/crowsonkb/k-diffusion).
 
-WaveDiT builds on the wavelet-domain analysis and multi-level evaluation protocol of our previous work, [FlowLet](https://danesed.github.io/flowlet-page/).
-
-The HDiT backbone is adapted from [k-diffusion](https://github.com/crowsonkb/k-diffusion). See `LICENSE`.
+App code © Danilo Danese, released under [MIT](LICENSE). The WaveDiT model weights are
+licensed CC BY-NC 4.0 (see the [model card](https://huggingface.co/danesed/WaveDiT)).

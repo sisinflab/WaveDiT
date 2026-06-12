@@ -1,8 +1,0 @@
-# Build artifacts produced by build.sh and packaging scripts
-.venv-build/
-build/
-dist/
-*.icns
-*.iconset/
-__pycache__/
-*.spec.bak

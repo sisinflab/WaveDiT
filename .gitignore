@@ -1,38 +1,17 @@
+# Build artifacts produced by build.sh and packaging scripts
+.venv-build/
+build/
+dist/
+*.icns
+*.iconset/
+
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.egg-info/
-build/
-dist/
+*.spec.bak
 
-# Virtual environments
-venv/
-env/
-.env
-.venv
-
-# IDE
+# OS / IDE
+.DS_Store
 .vscode/
 .idea/
 *.swp
-
-
-# Experiment outputs
-checkpoints/
-checkpoints_*/
-generated_samples/
-generated_*/
-logs/
-wandb/
-*.log
-*.pth
-*.pt
-
-# Data
-data/*.csv
-# keep the tiny format example tracked
-!data/example_catalog.csv
-*.nii
-*.nii.gz
-
