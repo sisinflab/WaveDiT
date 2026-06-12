@@ -131,9 +131,20 @@ def main():
     logger.info("Using device: %s", device)
 
     if cfg.logging.wandb:
+        wandb_id_file = run_dir / "wandb_run_id"
+        resuming = bool(cfg.train.resume_from) and Path(cfg.train.resume_from).is_file()
         try:
-            wandb.init(project=cfg.logging.wandb_project, entity=cfg.logging.wandb_entity,
-                       name=cfg.run_name, config=cfg.to_dict())
+            if resuming and wandb_id_file.is_file() and wandb_id_file.read_text().strip():
+                prev_id = wandb_id_file.read_text().strip()
+                wandb.init(project=cfg.logging.wandb_project, entity=cfg.logging.wandb_entity,
+                           name=cfg.run_name, config=cfg.to_dict(),
+                           id=prev_id, resume="allow")
+                logger.info("Resuming run '%s' (W&B id %s)", cfg.run_name, prev_id)
+            else:
+                wandb.init(project=cfg.logging.wandb_project, entity=cfg.logging.wandb_entity,
+                           name=cfg.run_name, config=cfg.to_dict())
+            run_dir.mkdir(parents=True, exist_ok=True)
+            wandb_id_file.write_text(wandb.run.id)
         except Exception as exc:  # noqa: BLE001 - never let logging setup abort a run
             logger.warning("Could not initialise W&B (%s); continuing without it.", exc)
             cfg.logging.wandb = False
