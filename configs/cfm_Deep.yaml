@@ -36,7 +36,7 @@ train:
   grad_clip_norm: 1.0
   early_stop_patience: 200
   num_flow_steps_sampling: 10
-  resume_from: null
+  resume_from: ./checkpoints/WaveDiT_CFM_Deep/last.pth
 
 sampling:
   sampler: heun                      # heun | euler

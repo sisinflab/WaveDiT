@@ -17,6 +17,8 @@ tags:
 
 [![Star on GitHub](https://img.shields.io/github/stars/sisinflab/WaveDiT?style=social)](https://github.com/sisinflab/WaveDiT)
 
+[![WaveDiT Studio for macOS](https://img.shields.io/badge/WaveDiT%20Studio-macOS%20app-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/sisinflab/WaveDiT/tree/macos-app)
+
 WaveDiT synthesises full-resolution, age-conditioned 3D brain MRIs by performing
 **conditional flow matching in the 3D Haar wavelet domain** with a slice-wise **HDiT**
 transformer backbone, guided by **Morpheus**, a state-aware uncertainty scheduler that
