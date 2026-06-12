@@ -1,0 +1,15 @@
+# WaveDiT Studio runtime dependencies (macOS arm64). Everything here is frozen
+# into the .app bundle by PyInstaller; nothing is installed on the user's machine.
+#
+# PyInstaller itself is NOT listed: it is a build-only dependency that build.sh
+# installs separately (pinned pyinstaller==6.*).
+
+torch==2.8.0          # same pin as the HF Space: arm64 wheel with MPS, loads the released checkpoints
+numpy                 # tensor postprocessing, thumbnails, icon rendering; torch picks a compatible build
+einops==0.8.0         # tensor rearranges inside the WaveDiT backbone; version used in training
+nibabel==5.3.2        # NIfTI volume read/write for the library and exports
+pyyaml>=6.0           # wavedit Config parsing (checkpoint-embedded configs)
+pywavelets==1.8.0     # 3D Haar DWT/IDWT used by the wavelet flow matching model
+tqdm==4.67.1          # progress reporting inside the vendored wavedit sampling path
+certifi               # CA bundle for the urllib HTTPS calls: the frozen libssl has no usable OPENSSLDIR on end-user Macs
+pywebview>=6          # native WKWebView window, save dialogs and the built-in Edit menu (clipboard shortcuts)
