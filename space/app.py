@@ -78,6 +78,7 @@ HF_REVISION = "main"
 CHECKPOINTS = {
     "Base (fast)": "WaveDiT-Base.pth",
     "FinePatch (detailed)": "WaveDiT-FinePatch.pth",
+    "Wide (largest)": "WaveDiT-Wide.pth",
 }
 DEFAULT_MODEL = "Base (fast)"
 
@@ -460,13 +461,36 @@ def _sample_to_array(
 # --------------------------------------------------------------------------- #
 # Duration estimators for @spaces.GPU
 # --------------------------------------------------------------------------- #
+# Per-NFE wall-time budget (seconds) by model. Wide (506M params, width 2048) is much
+# heavier per step than Base/FinePatch. Measured on the pure-PyTorch NA fallback (no
+# NATTEN, as on Spaces): Wide ~0.30 s/NFE at 224^3, so a 200-step Heun run is ~136 s.
+# 0.35 leaves a cross-hardware margin and the 240 s cap keeps the worst case declared:
+# OVER-declaring only lowers queue priority, while UNDER-declaring risks ZeroGPU killing
+# the call mid-generation.
+_PER_STEP_S = {"Wide": 0.35, "FinePatch": 0.11, "Base": 0.05}
+_DURATION_CAP_S = {"Wide": 240}  # default 180 for the others
+
+
+def _per_step_s(model_label) -> float:
+    for prefix, value in _PER_STEP_S.items():
+        if str(model_label).startswith(prefix):
+            return value
+    return 0.15
+
+
+def _duration_cap_s(model_label) -> int:
+    for prefix, value in _DURATION_CAP_S.items():
+        if str(model_label).startswith(prefix):
+            return value
+    return 180
+
+
 def _gen_duration(model_label, age, seed, steps, cfg_scale, sampler_label, morpheus, *args):
     nfe = 2 if SAMPLER_MAP.get(sampler_label, "heun") == "heun" else 1
-    per_step = 0.05 if str(model_label).startswith("Base") else 0.11
     # Single generate: weights are preloaded (no build/transfer here), so this is a
-    # pure sampling estimate plus a small fixed overhead. 200-step FinePatch Heun
-    # (~200*2*0.11 + 15 ~= 59 s) stays well under the cap.
-    return int(min(180, 15 + int(steps) * nfe * per_step))
+    # pure sampling estimate plus a small fixed overhead.
+    return int(min(_duration_cap_s(model_label),
+                   15 + int(steps) * nfe * _per_step_s(model_label)))
 
 
 def _sweep_frame_duration(model_label, age, frame_seed, steps,
@@ -475,9 +499,8 @@ def _sweep_frame_duration(model_label, age, frame_seed, steps,
     the budget only has to cover ONE frame (steps already clamped to SWEEP_STEPS_MAX).
     """
     nfe = 2 if SAMPLER_MAP.get(sampler_label, "heun") == "heun" else 1
-    per_step = 0.05 if str(model_label).startswith("Base") else 0.11
     steps = min(int(steps), SWEEP_STEPS_MAX)
-    return int(min(120, 15 + steps * nfe * per_step))
+    return int(min(150, 15 + steps * nfe * _per_step_s(model_label)))
 
 
 # --------------------------------------------------------------------------- #
