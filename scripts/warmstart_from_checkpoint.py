@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Warm-start a WaveDiT model from a pretrained checkpoint via shape-matched weight transfer.
 
-#TLDR; Warmstart a bigger WaveDiT model with a finer patch size from a pretrained donor with a 
-# smaller patch size, saving hours of training time.
+#TLDR; Warm-start a WaveDiT model from a pretrained donor that differs only in
+# patch size, saving hours of training. Works both ways: 
+# small->big (coarse donor -> finer target) and big->small (fine donor -> coarser target).
 
 ================================================================================
 WHY THIS WORKS
@@ -14,10 +15,11 @@ feed-forward blocks, the mapping network and the conditioning embedders) is
 dimension, never on the token-grid size. The only parameters tied to the patch
 size are the two patch projections, ``patch_in`` and ``patch_out``.
 
-Consequently a model trained with a coarse patch (e.g. 8x8 or 4x4) can hand
-almost all of its weights to a model with a finer patch (e.g. 2x2). Only the two
-patch projections must be re-initialised and re-learned; the expensive body
-starts already trained instead of from random noise. In practice this transfers
+Consequently a model trained at one patch size can hand almost all of its weights
+to a model with a different patch size, in either direction, coarse->fine
+(e.g. 8x8 -> 2x2) or fine->coarse (e.g. 2x2 -> 8x8). Only the two patch
+projections must be re-initialised and re-learned; the expensive body starts
+already trained instead of from random noise. In practice this transfers
 ~95 / 97 tensors and converges dramatically faster than training from scratch.
 
 The same mechanism doubles as a general "weight surgery" tool: any donor that
@@ -59,9 +61,9 @@ CAVEATS
 * Donor and target should share the transformer-body shape (depth, width, d_ff,
   attention types) for a full-body transfer. A donor with a different depth or
   width still works but contributes only the tensors that match exactly.
-* A finer patch changes the physical receptive field of neighborhood attention
-  and enlarges the token grid, so a short adaptation phase is expected. It is
-  still far ahead of random initialisation.
+* Changing the patch size changes the physical receptive field of neighborhood
+  attention and the token-grid size (either way), so a short adaptation phase is
+  expected. It is still far ahead of random initialisation.
 * Only model weights are transferred; the optimizer restarts from scratch, which
   is the recommended behaviour when the patch size (and thus part of the
   parameter set) changes.

@@ -69,7 +69,7 @@ pip install natten -f https://whl.natten.org
 Developed for Python 3.11 and PyTorch 2.6 (CUDA recommended).
 
 > **NATTEN is optional.** It is the fastest, ground-truth implementation of the
-> neighbourhood attention used in the default config, but WaveDiT ships an
+> neighbourhood attention used in the default config, but WaveDiT provides an
 > equivalent built-in pure-PyTorch fallback,
 > so the model runs without NATTEN, including on CPU. The backend is chosen
 > automatically; override with `WAVEDIT_NA_BACKEND=auto|natten|torch`.
