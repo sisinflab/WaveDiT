@@ -10,6 +10,7 @@ script just wires the pieces together.
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -149,6 +150,11 @@ def main():
 
     model = build_model(cfg, bundle.condition_config, bundle.condition_ranges,
                         bundle.categorical_maps, bundle.null_conditions).to(device)
+
+    if os.environ.get("WAVEDIT_GRAD_CKPT") == "1":
+        from wavedit.models.hdit import flags as _hdit_flags
+        _hdit_flags.state.checkpointing = True
+        logger.info("Gradient checkpointing ENABLED (WAVEDIT_GRAD_CKPT=1).")
 
     checkpoint_metadata = {
         "config": cfg.to_dict(),
