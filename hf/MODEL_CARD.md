@@ -66,9 +66,9 @@ changes a single axis.
 | Checkpoint | Variant | Changes vs. baseline | Params | Full-res inference VRAM¹ | Status |
 |---|---|---|---|---|---|
 | `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ~3.1 GB (runs from 4 GB) | ✅ trained |
-| `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ~8.4 GB (runs from 10 GB) | 🟡 pre-release · ⏳ training |
-| `WaveDiT-Deep.pth` | deeper | depth 4/4 | 190M | — | ⏳ training |
-| `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | — | ⏳ training |
+| `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ~8.4 GB (runs from 10 GB) | ✅ trained |
+| `WaveDiT-Deep.pth` | deeper | depth 4/4 | 262M | ~3.1 GB (runs from 4 GB) | ✅ trained |
+| `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | ~5.6 GB (runs from 8 GB) | ✅ trained |
 
 
 
@@ -93,8 +93,7 @@ pip install -r requirements.txt
 ```python
 from huggingface_hub import hf_hub_download
 
-# pick a variant: WaveDiT-Base | WaveDiT-FinePatch  (Deep/Wide coming soon)
-# revision="main" during the pre-release phase; a frozen "v1.0" tag will follow.
+# pick a variant: WaveDiT-Base | WaveDiT-FinePatch | WaveDiT-Deep | WaveDiT-Wide
 ckpt = hf_hub_download("danesed/WaveDiT", "WaveDiT-Base.pth", revision="main")
 ```
 
@@ -116,11 +115,10 @@ attention (e.g. on Spaces); the same checkpoint produces equivalent volumes.
 Volumes are written as NIfTI (`.nii.gz`) with intensities in `[0, 1]`.
 The checkpoint loads with the `torch.load` default `weights_only=True` (PyTorch ≥ 2.6).
 
-## Samples (pre-release preview)
+## Samples
 
 Age-conditioned synthesis with `WaveDiT-FinePatch` at a fixed seed;
-rows are axial · coronal · sagittal mid-slices, columns span ages 6→95. Generated with the
-**pre-release** checkpoint.
+rows are axial · coronal · sagittal mid-slices, columns span ages 6→95.
 
 ![WaveDiT-FinePatch aging](assets/samples/WaveDiT-FinePatch_aging.png)
 
