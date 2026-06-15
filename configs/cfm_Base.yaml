@@ -1,18 +1,18 @@
 # WaveDiT — Conditional Flow Matching (default experiment).
-# Launch with:  bash train.sh configs/cfm.yaml
-run_name: WaveDiT_CFM
+# Launch with:  bash train.sh configs/cfm_Base.yaml
+run_name: WaveDiT_CFM_Base   # baseline: patch [8,8], depth 2/2, width 1024, kernel 7, bs 8
 seed: 42
 device: cuda
 precision: bf16            # fp32 | fp16 | bf16
 
 data:
-  metadata_csv: ./data/dataset.csv   # build with scripts/prepare_metadata.py (CSV mode)
+  metadata_csv: ./data/main_dataset_catalog_BP_merged_normalized_final_train_FULLSIZE.csv
   data_folder: null                  # set instead of metadata_csv for filename-parsing mode
   conditions:                        # name -> numeric | categorical
     age: numeric
   image_size: [224, 224, 224]        # D H W, before the wavelet transform (latent is half)
   val_split: 0.2
-  num_workers: 8
+  num_workers: 32
   filepath_col: FilePath
   subject_id_col: SubjectID
   filter_col: Condition
@@ -43,7 +43,7 @@ sampling:
 
 logging:
   wandb: true
-  wandb_project: WaveDiT
+  wandb_project: WaveDiT-HF
   wandb_entity: null
   checkpoint_dir: ./checkpoints
 

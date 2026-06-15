@@ -98,7 +98,7 @@ class Trainer:
                     "val_loss": val_loss if self.val_loader is not None else None,
                     "learning_rate": current_lr,
                     "epoch_time_sec": elapsed,
-                }, step=self.global_step)
+                })
                 if self.val_loader is not None and self.visualize_fn is not None:
                     self._run_visualization(epoch)
 
@@ -147,7 +147,7 @@ class Trainer:
             total_samples += batch_size
             pbar.set_postfix(loss=f"{loss.item():.4f}", grad=f"{grad_norm.item():.3f}")
             if self.use_wandb and self.global_step % 100 == 0:
-                wandb.log({"train/grad_norm": grad_norm.item()}, step=self.global_step)
+                wandb.log({"train/grad_norm": grad_norm.item(), "global_step": self.global_step})
 
         if dropped_batches:
             logger.warning("Epoch %d: dropped %d batch(es) with no loadable samples.", epoch + 1, dropped_batches)
