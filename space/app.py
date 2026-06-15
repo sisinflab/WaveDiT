@@ -78,6 +78,7 @@ HF_REVISION = "main"
 CHECKPOINTS = {
     "Base (fast)": "WaveDiT-Base.pth",
     "FinePatch (detailed)": "WaveDiT-FinePatch.pth",
+    "Deep (deepest)": "WaveDiT-Deep.pth",
     "Wide (largest)": "WaveDiT-Wide.pth",
 }
 DEFAULT_MODEL = "Base (fast)"
@@ -461,14 +462,14 @@ def _sample_to_array(
 # --------------------------------------------------------------------------- #
 # Duration estimators for @spaces.GPU
 # --------------------------------------------------------------------------- #
-# Per-NFE wall-time budget (seconds) by model. Wide (506M params, width 2048) is much
-# heavier per step than Base/FinePatch. Measured on the pure-PyTorch NA fallback (no
-# NATTEN, as on Spaces): Wide ~0.30 s/NFE at 224^3, so a 200-step Heun run is ~136 s.
-# 0.35 leaves a cross-hardware margin and the 240 s cap keeps the worst case declared:
-# OVER-declaring only lowers queue priority, while UNDER-declaring risks ZeroGPU killing
-# the call mid-generation.
-_PER_STEP_S = {"Wide": 0.35, "FinePatch": 0.11, "Base": 0.05}
-_DURATION_CAP_S = {"Wide": 240}  # default 180 for the others
+# Per-NFE wall-time budget (seconds) by model. Wide (width 2048) and Deep (depth 4/4)
+# are much heavier per step than Base/FinePatch. Measured on the pure-PyTorch NA fallback
+# (no NATTEN, as on Spaces) at 224^3: Wide ~0.30 s/NFE, Deep ~0.66 s/NFE (the deeper stack
+# is the slowest). The per-model values add a cross-hardware margin and the caps keep the
+# worst case (200-step Heun = 400 NFE) declared: OVER-declaring only lowers queue priority,
+# while UNDER-declaring risks ZeroGPU killing the call mid-generation.
+_PER_STEP_S = {"Deep": 0.75, "Wide": 0.35, "FinePatch": 0.11, "Base": 0.05}
+_DURATION_CAP_S = {"Deep": 330, "Wide": 240}  # default 180 for the others
 
 
 def _per_step_s(model_label) -> float:
