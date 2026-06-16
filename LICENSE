@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-This repository includes code adapted from third parties:
-  * k-diffusion (https://github.com/crowsonkb/k-diffusion), MIT License — the
-    HDiT backbone in wavedit/models/hdit/.
-  * wdm-3d (https://github.com/pfriedri/wdm-3d) — the 3D wavelet transform in
-    wavedit/wavelets/.
