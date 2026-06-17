@@ -32,7 +32,7 @@ sagittal panels + an interactive 3D render you can rotate and cut into with a cl
 ## Features
 
 - **One-click generation** — pick an age, press *Generate*, get a 3D brain you can rotate & slice.
-- **Two models** — *Base* (fast, ~3 GB VRAM) and *FinePatch* (sharper, slower). Both 142M params.
+- **Five models** — *Base* (fast, ~3 GB VRAM), the finer *FinePatch* / *FinePatch2* (warm-started), and the larger *Deep* / *Wide*. One shared HDiT backbone.
 - **Full control** — seed, ODE steps (1–200, default 10), CFG scale, sampler (Heun/Euler), and
   *Morpheus* state-aware uncertainty guidance (set to 0 to ablate).
 - **🎲 Random** buttons for age and seed, plus curated **presets** (Child / Prime / Elder /

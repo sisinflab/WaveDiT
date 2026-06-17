@@ -19,6 +19,7 @@ Configs, run names and checkpoint folders all use the descriptive variant names
 |---|---|
 | `checkpoints/WaveDiT_CFM_Base/best.pth` | `WaveDiT-Base.pth` |
 | `checkpoints/WaveDiT_CFM_FinePatch/best.pth` | `WaveDiT-FinePatch.pth` |
+| `checkpoints/WaveDiT_CFM_Patch2/best.pth` | `WaveDiT-FinePatch2.pth` |
 | `checkpoints/WaveDiT_CFM_Deep/best.pth` | `WaveDiT-Deep.pth` |
 | `checkpoints/WaveDiT_CFM_Wide/best.pth` | `WaveDiT-Wide.pth` |
 
@@ -36,6 +37,7 @@ slim() {  # slim() <run_folder> <release_name>
 }
 slim WaveDiT_CFM_Base WaveDiT-Base
 slim WaveDiT_CFM_FinePatch WaveDiT-FinePatch
+slim WaveDiT_CFM_Patch2 WaveDiT-FinePatch2
 slim WaveDiT_CFM_Deep WaveDiT-Deep
 slim WaveDiT_CFM_Wide WaveDiT-Wide
 ```
@@ -60,6 +62,7 @@ hf upload danesed/WaveDiT WaveDiT-Base.pth WaveDiT-Base.pth
 # Later, as each run finishes — one commit each:
 hf upload danesed/WaveDiT WaveDiT-Deep.pth WaveDiT-Deep.pth
 hf upload danesed/WaveDiT WaveDiT-FinePatch.pth WaveDiT-FinePatch.pth
+hf upload danesed/WaveDiT WaveDiT-FinePatch2.pth WaveDiT-FinePatch2.pth
 hf upload danesed/WaveDiT WaveDiT-Wide.pth WaveDiT-Wide.pth
 ```
 

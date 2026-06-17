@@ -78,6 +78,7 @@ HF_REVISION = "main"
 CHECKPOINTS = {
     "Base (fast)": "WaveDiT-Base.pth",
     "FinePatch (detailed)": "WaveDiT-FinePatch.pth",
+    "FinePatch2 (finest)": "WaveDiT-FinePatch2.pth",
     "Deep (deepest)": "WaveDiT-Deep.pth",
     "Wide (largest)": "WaveDiT-Wide.pth",
 }
@@ -902,7 +903,7 @@ def build_demo() -> gr.Blocks:
                     age_help = gr.Markdown(age_microcopy(AGE_DEFAULT))
                     model = gr.Radio(
                         list(CHECKPOINTS.keys()), value=DEFAULT_MODEL, label="Model",
-                        info="Base = faster, ~3 GB VRAM. FinePatch = sharper, slower.",
+                        info="Base = faster, ~3 GB VRAM. FinePatch / FinePatch2 = sharper, finer, more VRAM.",
                     )
                     generate_btn = gr.Button("✦ Generate brain", variant="primary", size="lg")
                     status = gr.Markdown("Ready. Pick an age and press Generate.")

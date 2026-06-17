@@ -67,6 +67,7 @@ changes a single axis.
 |---|---|---|---|---|---|
 | `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ~3.1 GB (runs from 4 GB) | ✅ trained |
 | `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ~8.4 GB (runs from 10 GB) | ✅ trained |
+| `WaveDiT-FinePatch2.pth` | finest patches (warm-started) | patch 2×2 (16× tokens) | 142M | ~27 GB (runs from 32 GB) | 🟡 pre-release · ⏳ training |
 | `WaveDiT-Deep.pth` | deeper | depth 4/4 | 262M | ~3.1 GB (runs from 4 GB) | ✅ trained |
 | `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | ~5.6 GB (runs from 8 GB) | ✅ trained |
 
@@ -78,6 +79,19 @@ patch size, width and depth are config knobs over a compact wavelet representati
 a wide range of hardware budgets: **full-resolution inference runs on GPUs from 4 GB
 upward** (Base), and the same configs scale training down to modest GPUs by adjusting
 batch size / variant. No high-end accelerator is required to *use* the models.
+
+
+### FinePatch2: warm-started, not trained from scratch
+
+`WaveDiT-FinePatch2` takes the patch axis to its finest setting (2×2 patches, a 56×56
+token grid, 16× the tokens of `Base`). It was **not** trained from scratch: it was
+**warm-started by weight inheritance** from `WaveDiT-FinePatch` (4×4). The entire HDiT
+transformer body transfers 1:1, and only the two patch projections are resized to the
+finer grid with a FlexiViT pseudo-inverse resize, so optimisation resumes already in
+distribution instead of from noise. In practice this **cut wall-clock training time
+drastically** versus a from-scratch run, while the finer token grid produces
+**very high quality samples**. The procedure is `scripts/weight_inheritance.py` in the
+[GitHub repository](https://github.com/sisinflab/WaveDiT).
 
 
 ## How to use
@@ -93,7 +107,7 @@ pip install -r requirements.txt
 ```python
 from huggingface_hub import hf_hub_download
 
-# pick a variant: WaveDiT-Base | WaveDiT-FinePatch | WaveDiT-Deep | WaveDiT-Wide
+# pick a variant: WaveDiT-Base | WaveDiT-FinePatch | WaveDiT-FinePatch2 | WaveDiT-Deep | WaveDiT-Wide
 ckpt = hf_hub_download("danesed/WaveDiT", "WaveDiT-Base.pth", revision="main")
 ```
 
