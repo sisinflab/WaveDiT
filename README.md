@@ -161,7 +161,12 @@ All variants are published on the Hugging Face Hub at
 | Deep | depth 4/4 | 262M | ~3.1 GB (runs from 4 GB) | [WaveDiT-Deep.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-Deep.pth) |
 | Wide | width 2048, d_ff 8192 | 506M | ~5.6 GB (runs from 8 GB) | [WaveDiT-Wide.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-Wide.pth) |
 
-¹ Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun.
+¹ Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun
+(`torch.cuda.max_memory_reserved`). The HDiT backbone is **highly scalable**: because
+patch size, width and depth are config knobs over a compact wavelet representation, WaveDiT fits
+a wide range of hardware budgets: **full-resolution inference runs on GPUs from 4 GB
+upward** (Base), and the same configs scale training down to modest GPUs by adjusting
+batch size / variant. No high-end accelerator is required to *use* the models.
 
 `WaveDiT-FinePatch2` was trained by **warm start** (weight inheritance) from
 `WaveDiT-FinePatch`, not from scratch (see [Warm-start a new variant](#warm-start-a-new-variant)),
