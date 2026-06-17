@@ -126,6 +126,27 @@ Each run writes to `<checkpoint_dir>/<run_name>/`: `best.pth`, `last.pth`, a cop
 resolved `config.yaml`, and logs. Set `logging.wandb: true` for W&B metrics and
 visualisations. Switch the objective with `model.flow` (`cfm` | `rectified` | `ot_fm`).
 
+### Warm-start a new variant
+
+A variant that differs from a trained one only in patch size does not need to train from
+scratch. `scripts/weight_inheritance.py` hands almost all of a trained checkpoint's
+weights to the new model: the HDiT body transfers 1:1, and only the two patch projections
+are resized to the new token grid with a FlexiViT pseudo-inverse resize. Coarse-to-fine
+starts already in distribution and converges far faster than a from-scratch run.
+
+```bash
+# Example: warm-start FinePatch (4x4) from a trained Base (8x8)
+python scripts/weight_inheritance.py \
+    --donor  checkpoints/WaveDiT_CFM_Base/best.pth \
+    --config configs/cfm_FinePatch.yaml \
+    --output checkpoints/WaveDiT_CFM_FinePatch/last.pth
+bash train.sh configs/cfm_FinePatch.yaml   # resumes at epoch 0 with the inherited weights
+```
+
+The released finest variant, `WaveDiT-FinePatch2` (patch 2×2), was produced this way,
+warm-started from `WaveDiT-FinePatch` (patch 4×4), which cut its training time drastically
+versus training from scratch while keeping very high sample quality.
+
 ## Generation
 
 Checkpoints are self-contained (they embed the config and condition metadata), so
