@@ -131,7 +131,7 @@ visualisations. Switch the objective with `model.flow` (`cfm` | `rectified` | `o
 A variant that differs from a trained one only in patch size does not need to train from
 scratch. `scripts/weight_inheritance.py` hands almost all of a trained checkpoint's
 weights to the new model: the HDiT body transfers 1:1, and only the two patch projections
-are resized to the new token grid with a FlexiViT pseudo-inverse resize. Coarse-to-fine
+are resized to the new token grid with a pseudo-inverse patch resize. Coarse-to-fine
 starts already in distribution and converges far faster than a from-scratch run.
 
 ```bash
@@ -146,6 +146,32 @@ bash train.sh configs/cfm_FinePatch.yaml   # resumes at epoch 0 with the inherit
 The released finest variant, `WaveDiT-FinePatch2` (patch 2×2), was produced this way,
 warm-started from `WaveDiT-FinePatch` (patch 4×4), which cut its training time drastically
 versus training from scratch while keeping very high sample quality.
+
+## Pretrained weights
+
+All variants are published on the Hugging Face Hub at
+[`danesed/WaveDiT`](https://huggingface.co/danesed/WaveDiT). Each `.pth` is self-contained
+(architecture and condition metadata embedded), so generation needs only the file.
+
+| Model | Variant | Params | Full-res inference VRAM¹ | Download |
+|---|---|---|---|---|
+| Base | patch 8×8 (baseline) | 142M | ~3.1 GB (runs from 4 GB) | [WaveDiT-Base.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-Base.pth) |
+| FinePatch | patch 4×4 | 142M | ~8.4 GB (runs from 10 GB) | [WaveDiT-FinePatch.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-FinePatch.pth) |
+| FinePatch2 | patch 2×2, warm-started | 142M | ~27 GB (runs from 32 GB) | [WaveDiT-FinePatch2.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-FinePatch2.pth) |
+| Deep | depth 4/4 | 262M | ~3.1 GB (runs from 4 GB) | [WaveDiT-Deep.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-Deep.pth) |
+| Wide | width 2048, d_ff 8192 | 506M | ~5.6 GB (runs from 8 GB) | [WaveDiT-Wide.pth](https://huggingface.co/danesed/WaveDiT/blob/main/WaveDiT-Wide.pth) |
+
+¹ Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun.
+
+`WaveDiT-FinePatch2` was trained by **warm start** (weight inheritance) from
+`WaveDiT-FinePatch`, not from scratch (see [Warm-start a new variant](#warm-start-a-new-variant)),
+which cut its training time drastically while reaching the finest 2×2 token grid at very
+high sample quality.
+
+```python
+from huggingface_hub import hf_hub_download
+ckpt = hf_hub_download("danesed/WaveDiT", "WaveDiT-FinePatch2.pth")
+```
 
 ## Generation
 
