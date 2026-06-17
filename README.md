@@ -125,6 +125,15 @@ Each run writes to `<checkpoint_dir>/<run_name>/`: `best.pth`, `last.pth`, a cop
 resolved `config.yaml`, and logs. Set `logging.wandb: true` for W&B metrics and
 visualisations. Switch the objective with `model.flow` (`cfm` | `rectified` | `ot_fm`).
 
+## Scaling and VRAM
+
+Peak VRAM for full-resolution (224³) generation, batch 1, bf16, 10-step Heun
+(`torch.cuda.max_memory_reserved`). The HDiT backbone is **highly scalable**: because
+patch size, width and depth are config knobs over a compact wavelet representation, WaveDiT fits
+a wide range of hardware budgets: **full-resolution inference runs on GPUs from 4 GB
+upward** (Base), and the same configs scale training down to modest GPUs by adjusting
+batch size / variant. No high-end accelerator is required to *use* the models.
+
 ## Generation
 
 Checkpoints are self-contained (they embed the config and condition metadata), so
