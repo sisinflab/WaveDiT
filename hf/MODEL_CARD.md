@@ -67,7 +67,7 @@ changes a single axis.
 |---|---|---|---|---|---|
 | `WaveDiT-Base.pth` | baseline | patch 8×8, depth 2/2, width 1024 | 142M | ~3.1 GB (runs from 4 GB) | ✅ trained |
 | `WaveDiT-FinePatch.pth` | finer patches | patch 4×4 (4× tokens) | 142M | ~8.4 GB (runs from 10 GB) | ✅ trained |
-| `WaveDiT-FinePatch2.pth` | finest patches (warm-started) | patch 2×2 (16× tokens) | 142M | ~27 GB (runs from 32 GB) | 🟡 pre-release · ⏳ training |
+| `WaveDiT-FinePatch2.pth` | finest patches (warm-started) | patch 2×2 (16× tokens) | 142M | ~27 GB (runs from 32 GB) | ✅ trained (warm-start) |
 | `WaveDiT-Deep.pth` | deeper | depth 4/4 | 262M | ~3.1 GB (runs from 4 GB) | ✅ trained |
 | `WaveDiT-Wide.pth` | wider | width 2048, d_ff 8192 | 506M | ~5.6 GB (runs from 8 GB) | ✅ trained |
 
@@ -87,11 +87,11 @@ batch size / variant. No high-end accelerator is required to *use* the models.
 token grid, 16× the tokens of `Base`). It was **not** trained from scratch: it was
 **warm-started by weight inheritance** from `WaveDiT-FinePatch` (4×4). The entire HDiT
 transformer body transfers 1:1, and only the two patch projections are resized to the
-finer grid with a FlexiViT pseudo-inverse resize, so optimisation resumes already in
-distribution instead of from noise. In practice this **cut wall-clock training time
-drastically** versus a from-scratch run, while the finer token grid produces
-**very high quality samples**. The procedure is `scripts/weight_inheritance.py` in the
-[GitHub repository](https://github.com/sisinflab/WaveDiT).
+finer grid with a pseudo-inverse patch resize, so optimisation resumes already in
+distribution instead of from noise. The released checkpoint (epoch 34) reached the finest
+token grid at **very high sample quality** while **cutting wall-clock training time
+drastically** versus a from-scratch run. The procedure is `scripts/weight_inheritance.py`
+in the [GitHub repository](https://github.com/sisinflab/WaveDiT).
 
 
 ## How to use
