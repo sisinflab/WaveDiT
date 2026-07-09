@@ -1,0 +1,12 @@
+@article{DBLP:journals/corr/abs-2606-08670,
+  author       = {Danilo Danese and
+                  Angela Lombardi and
+                  Giuseppe Fasano and
+                  Matteo Attimonelli and
+                  Tommaso Di Noia},
+  title        = {WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D
+                  Brain {MRI} Synthesis},
+  journal      = {CoRR},
+  volume       = {abs/2606.08670},
+  year         = {2026}
+}
