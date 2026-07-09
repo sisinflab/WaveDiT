@@ -208,14 +208,17 @@ Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
 ## Citation
 
 ```bibtex
-@misc{danese2026waveditdistributionawarewaveletflow,
-      title={WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis},
-      author={Danilo Danese and Angela Lombardi and Giuseppe Fasano and Matteo Attimonelli and Tommaso Di Noia},
-      year={2026},
-      eprint={2606.08670},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2606.08670},
+@article{DBLP:journals/corr/abs-2606-08670,
+  author       = {Danilo Danese and
+                  Angela Lombardi and
+                  Giuseppe Fasano and
+                  Matteo Attimonelli and
+                  Tommaso Di Noia},
+  title        = {WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D
+                  Brain {MRI} Synthesis},
+  journal      = {CoRR},
+  volume       = {abs/2606.08670},
+  year         = {2026}
 }
 ```
 
