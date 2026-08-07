@@ -10,8 +10,11 @@
 
 > 🤗 **Try WaveDiT in your browser:** pick an age, generate a synthetic 3D brain MRI, and explore it interactively (triplane + 3D viewer with clip-plane slicing). No install needed &rarr; **[huggingface.co/spaces/danesed/WaveDiT-demo](https://huggingface.co/spaces/danesed/WaveDiT-demo)**
 
-Official PyTorch implementation of *"WaveDiT: Distribution-Aware Wavelet Flow Matching
-for Efficient 3D Brain MRI Synthesis"* (MICCAI 2026).
+Official PyTorch implementation of *"WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D Brain MRI Synthesis"* (MICCAI 2026).
+
+**NEWS**
+* 🎉 WaveDiT has been early-accepted and selected for **oral presentation** at [MICCAI 2026](https://conferences.miccai.org/2026/en/) (top 9%)!
+
 
 WaveDiT synthesises full resolution, high-fidelity, conditional 3D brain MRIs by performing **flow
 matching in the 3D Haar wavelet domain** with a slice-wise **HDiT** backbone, guided by
