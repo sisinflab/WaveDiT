@@ -27,6 +27,7 @@ sampling across frequency bands.
 
 **Links:** [🤗 Live demo](https://huggingface.co/spaces/danesed/WaveDiT-demo) ·
 [🤗 Models](https://huggingface.co/danesed/WaveDiT) ·
+[Paper](https://papers.miccai.org/miccai-2026/paper/4757_paper.pdf) ·
 [Project page](https://danesed.github.io/wavedit-page/) ·
 [HF paper](https://huggingface.co/papers/2606.08670) ·
 [arXiv](https://arxiv.org/abs/2606.08670)
@@ -211,7 +212,7 @@ Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
 ## Citation
 
 ```bibtex
-@article{DBLP:journals/corr/abs-2606-08670,
+@inproceedings{DBLP:conf/miccai/DaneseLFAN26,
   author       = {Danilo Danese and
                   Angela Lombardi and
                   Giuseppe Fasano and
@@ -219,8 +220,11 @@ Or use the launcher: `bash generate.sh checkpoints/WaveDiT_CFM/best.pth`.
                   Tommaso Di Noia},
   title        = {WaveDiT: Distribution-Aware Wavelet Flow Matching for Efficient 3D
                   Brain {MRI} Synthesis},
-  journal      = {CoRR},
-  volume       = {abs/2606.08670},
+  booktitle    = {{MICCAI} {(13)}},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {16890},
+  pages        = {618--628},
+  publisher    = {Springer},
   year         = {2026}
 }
 ```
